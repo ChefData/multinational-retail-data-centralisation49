@@ -73,33 +73,3 @@ class DataCleaning:
         user_data_df.loc[~user_data_df['phone_number'].str.match(regex_expression), 'phone_number'] = np.nan  
         user_data_df['phone_number'] = user_data_df['phone_number'].replace({r'\+44':  '0',  r'\(':  '',  r'\)':  '',  r'-':  '',  r'  ':  ''},  regex=True)
         '''
-
-'''
-from data_extraction import DataExtractor
-from database_utils import DatabaseConnector
-
-if __name__ == "__main__":
-    # Creating Class instances
-    data_cleaner = DataCleaning()
-    data_extractor = DataExtractor()
-    db_connector = DatabaseConnector()
-
-    # Using list_db_tables to get the name of the table containing user data
-    user_data_table = db_connector.list_db_tables()[1]
-    
-    # Using read_rds_table to extract the table containing user data
-    user_data = data_extractor.read_rds_table(db_connector, user_data_table)
-
-    # Cleaning user data
-    cleaned_data = data_cleaner.clean_user_data(user_data)
-
-    # Printing the original DataFrame
-    print("User Data:")
-    print(user_data_df)
-    print(user_data_df.info())
-
-    # Printing the cleaned DataFrame
-    print("Cleaned User Data:")
-    print(cleaned_data)
-    print(cleaned_data.info())
-'''
