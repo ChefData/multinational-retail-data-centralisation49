@@ -40,24 +40,3 @@ class DataExtractor:
             df = pd.read_sql_table(table_name, connection)
         
         return df
-    
-'''
-from data_extraction import DataExtractor
-from database_utils import DatabaseConnector
-
-if __name__ == "__main__":
-    # Creating Class instances
-    db_connector = DatabaseConnector() 
-    data_extractor = DataExtractor()
-    
-    # Using list_db_tables to get the name of the table containing user data
-    user_data_table = db_connector.list_db_tables()[1]
-    
-    # Using read_rds_table to extract the table containing user data
-    user_data_df = data_extractor.read_rds_table(db_connector, user_data_table)
-    
-    # Printing the original DataFrame
-    print("User Data DataFrame:")
-    print(user_data_df)
-    print(user_data_df.info())
-'''
