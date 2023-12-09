@@ -1,5 +1,5 @@
 import pandas as pd
-
+import tabula
 
 class DataExtractor:
     """
@@ -40,3 +40,7 @@ class DataExtractor:
             df = pd.read_sql_table(table_name, connection)
         
         return df
+    
+    def retrieve_pdf_data(self):
+        pdf_path = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
+        dfs = tabula.read_pdf(pdf_path, pages='all')
