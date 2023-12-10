@@ -11,15 +11,15 @@ class DataExtractor:
         Read a table from a database using the provided DatabaseConnector.
 
         Parameters:
-        - db_connector: An instance of a DatabaseConnector.
-        - table_name: Name of the table to read.
+            - db_connector: An instance of a DatabaseConnector.
+            - table_name: Name of the table to read.
 
         Returns:
-        - Pandas DataFrame containing the data from the specified table.
+            - Pandas DataFrame containing the data from the specified table.
 
         Raises:
-        - RuntimeError: If there is an error initializing the database engine.
-        - ValueError: If the specified table does not exist in the database.
+            - RuntimeError: If there is an error initializing the database engine.
+            - ValueError: If the specified table does not exist in the database.
 
         """
         # Get the engine from the DatabaseConnector
