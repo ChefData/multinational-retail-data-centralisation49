@@ -1,3 +1,4 @@
+#%%
 import logging
 import yaml
 from sqlalchemy import create_engine, inspect, pool
@@ -95,8 +96,8 @@ class DatabaseConnector:
             list: List of table names in the database.
         """
         try:
-            with self.db_engine.connect() as connection:
-                inspector = inspect(self.db_engine)
+            with self.db_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as connection:
+                inspector = inspect(connection)
                 table_names = inspector.get_table_names()
             return table_names
         except SQLAlchemyError as e:
@@ -168,8 +169,11 @@ if __name__ == "__main__":
     # Uploading DataFrame to a specified table
     table_name_to_upload = 'dim_users'
     pg_connector.upload_to_db(cleaned_data, table_name_to_upload)
-    print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' database.")
-    
+    pg_engine = pg_connector.init_db_engine()
+    print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.\nPostgreSQL Database Engine: '{pg_engine}'")
+
     # Close the database connection
     db_connector.close_db_connection()
     pg_connector.close_db_connection()
+
+# %%
