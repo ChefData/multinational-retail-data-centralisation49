@@ -1,5 +1,7 @@
+#%%
 import pandas as pd
 import tabula
+
 
 class DataExtractor:
     """
@@ -37,10 +39,11 @@ class DataExtractor:
         
         # Read the table into a Pandas DataFrame
         with db_engine.connect() as connection:
-            df = pd.read_sql_table(table_name, connection)
+            user_data_df = pd.read_sql_table(table_name, connection)
         
-        return df
+        return user_data_df
     
-    def retrieve_pdf_data(self):
-        pdf_path = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
-        dfs = tabula.read_pdf(pdf_path, pages='all')
+    def retrieve_pdf_data(self, pdf_link):
+        pdf_data = tabula.read_pdf(pdf_link, pages='all', multiple_tables=True, lattice=True)
+        card_data_df = pd.concat(pdf_data)
+        return card_data_df
