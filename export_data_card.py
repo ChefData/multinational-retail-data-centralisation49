@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print(raw_card_data)
     print(raw_card_data.info())
 
-    # Cleaning user data
+    # Cleaning Card data
     cleaned_card_data = data_cleaner.clean_card_data(raw_card_data)
     
     # Printing the cleaned DataFrame
