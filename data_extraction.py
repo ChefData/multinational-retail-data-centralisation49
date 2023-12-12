@@ -1,11 +1,14 @@
 import pandas as pd
 import tabula
+import requests
 
 
 class DataExtractor:
     """
     A class for extracting data from a database using a provided DatabaseConnector.
     """
+    def __init__(self):
+        self.header = None
 
     def read_rds_table(self, db_connector, table_name: str) -> pd.DataFrame:
         """
@@ -66,3 +69,35 @@ class DataExtractor:
             raise FileNotFoundError(f"The PDF file was not found @ link: '{pdf_link}'")
         except Exception as e:
             raise RuntimeError(f"An error occurred while processing the PDF: {e}")
+
+    def set_api_key(self, api_key):
+        self.header = {'x-api-key': api_key}
+
+    def list_number_of_stores(self, number_stores_endpoint):
+        try:
+            # Send a GET request to the API to retrieve information
+            response = requests.get(number_stores_endpoint, headers=self.header)
+            # Raise an HTTPError for bad responses (4xx or 5xx)
+            response.raise_for_status()
+            # Access the response data as JSON
+            number_of_stores = response.json().get('number_stores')
+            return number_of_stores
+        except requests.exceptions.RequestException as e:
+            raise requests.exceptions.RequestException(f"Error retrieving number of stores: {e} \nStatus code: {response.status_code} \nResponse Text: {response.text}")
+            
+    def retrieve_stores_data(self, store_endpoint, number_of_stores):
+        try:
+            all_stores_data = []
+            for store_number in range(1, number_of_stores):
+                # Send a GET request to the API endpoint for each store
+                response = requests.get(store_endpoint.format(store_number), headers=self.header)
+                # Raise an HTTPError for bad responses (4xx or 5xx)
+                response.raise_for_status()  
+                # Access the response data as JSON and Append to the list
+                store_data = response.json()
+                all_stores_data.append(store_data)
+            # Create a DataFrame from the list of store data
+            df = pd.DataFrame(all_stores_data)
+            return df
+        except requests.exceptions.RequestException as e:
+            raise requests.exceptions.RequestException(f"Error retrieving store data: {e}")
