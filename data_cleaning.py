@@ -74,14 +74,17 @@ class DataCleaning:
         email_regex_expression = r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$" 
         user_data_df['email_address_check'] = user_data_df['email_address'].map(lambda i: bool(re.match(email_regex_expression, i)))
 
+        # Check phone numbers against general regular expression
         phone_regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
         user_data_df['phone_number_check'] = user_data_df['phone_number'].map(lambda i: bool(re.match(phone_regex_expression, i)))
         
         '''
+        # Check German phone numbers against country specific regular expression
         de_phone_regex_expression = '(\(?([\d \-\)\–\+\/\(]+){6,}\)?([ .\-–\/]?)([\d]+))'
         user_data_df.loc[de_mask, 'phone_number3']  = user_data_df.loc[de_mask, 'phone_number2'].map(lambda i: bool(re.match(de_phone_regex_expression, i)))
         
-        us_phone_regex_expression = '(\d{3}[-\.\s]\d{3}[-\.\s]\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]\d{4}|\d{3}[-\.\s]\d{4})'
+        # Check American phone numbers against country specific regular expression
+        s_phone_regex_expression = '(\d{3}[-\.\s]\d{3}[-\.\s]\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]\d{4}|\d{3}[-\.\s]\d{4})'
         user_data_df.loc[us_mask, 'phone_number_check']  = user_data_df.loc[us_mask, 'phone_number'].map(lambda i: bool(re.match(us_phone_regex_expression, i)))
         '''
 
@@ -98,10 +101,11 @@ class DataCleaning:
         make_category = ['company', 'country', 'country_code']
         user_data_df[make_category] = user_data_df[make_category].astype('category')
 
+        # Return cleaner DataFrame
         return user_data_df
 
         '''     
-        # Reset indexv
+        # Reset index
         #user_data_df = user_data_df.set_index('index')
         
         # Handling incorrectly typed values
@@ -142,10 +146,41 @@ class DataCleaning:
         card_data_df['expiry_date'] = pd.to_datetime(card_data_df['expiry_date'], format="%m/%y", errors='coerce')
         card_data_df['date_payment_confirmed'] = pd.to_datetime(card_data_df['date_payment_confirmed'], format="%Y-%m-%d", errors='coerce')
         
-        # Handling incorrectly typed values
-        #card_data_df['country_code'] = card_data_df['country_code'].str.replace('GGB', 'GB')
-
+        # Return cleaner DataFrame
         return card_data_df
     
-    def called_clean_store_data(self):
-        pass
+    def called_clean_store_data(self, store_data_df):
+        # Reset index
+        store_data_df = store_data_df.set_index('index')
+        
+        # Handling incorrectly entered rows
+        mask = store_data_df['longitude'].apply(lambda x: pd.notna(x) and not any(c.isalpha() for c in str(x)))
+        store_data_df = store_data_df[mask]
+        
+        # Drop lat column
+        store_data_df.drop("lat", axis="columns", inplace=True)
+        
+        # Handling incorrectly typed values
+        store_data_df['continent'] = store_data_df['continent'].str.replace('ee', '')
+
+        # Handling errors with dates
+        store_data_df['opening_date'] = pd.to_datetime(store_data_df['opening_date'], format='mixed', errors='coerce')
+
+        # Rename incorrectly labeled columns
+        store_data_df.rename(columns = {'latitude':'longitude', 'longitude':'latitude'}, inplace = True)
+
+        # Check latitude against regular expression
+        lat_regex_expression = '^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$'
+        store_data_df['latitude_check'] = store_data_df['latitude'].map(lambda i: bool(re.match(lat_regex_expression, i)))
+        
+        # Check longitude against regular expression
+        lon_regex_expression = '^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$'
+        store_data_df['longitude_check'] = store_data_df['longitude'].map(lambda i: bool(re.match(lon_regex_expression, i)))
+
+        # Reorder columns
+        reorder_columns = ['store_code', 'store_type', 'opening_date', 'staff_numbers', 'address', 'locality', 'country_code', 'continent', 'latitude', 'longitude', 'latitude_check', 'longitude_check']
+        store_data_df = store_data_df.reindex(columns=reorder_columns)
+
+        # Return cleaner DataFrame
+        return store_data_df
+
