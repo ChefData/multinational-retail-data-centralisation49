@@ -1,4 +1,3 @@
-#%%
 import pandas as pd
 import tabula
 
@@ -28,7 +27,7 @@ class DataExtractor:
         try:
             db_engine = db_connector.init_db_engine()
         except Exception as e:
-            raise RuntimeError("Error initializing database engine. Check your connection settings.") from e
+            raise RuntimeError("Error initializing database engine. Check your connection settings: {e}")
 
         # List tables in the database
         tables = db_connector.list_db_tables() 
@@ -39,11 +38,31 @@ class DataExtractor:
         
         # Read the table into a Pandas DataFrame
         with db_engine.connect() as connection:
-            user_data_df = pd.read_sql_table(table_name, connection)
-        
+            user_data_df = pd.read_sql_table(table_name, connection, index_col='index')
         return user_data_df
     
     def retrieve_pdf_data(self, pdf_link):
-        pdf_data = tabula.read_pdf(pdf_link, pages='all', multiple_tables=True, lattice=True)
-        card_data_df = pd.concat(pdf_data)
-        return card_data_df
+        """
+        Retrieve data from a PDF file.
+
+        Parameters:
+        - pdf_link (str): The file path or URL of the PDF.
+
+        Returns:
+        - pandas.DataFrame: A DataFrame containing the extracted data from the PDF.
+
+        Raises:
+        - FileNotFoundError: If the specified PDF file is not found.
+        - RuntimeError: If an unexpected error occurs during PDF processing.
+        """
+        try:
+            # Read pdf into list of DataFrame
+            pdf_data = tabula.read_pdf(pdf_link, pages='all', multiple_tables=True, lattice=True)
+            
+            # Concatenate list of DataFrame into single dataframe
+            card_data_df = pd.concat(pdf_data)
+            return card_data_df
+        except FileNotFoundError:
+            raise FileNotFoundError(f"The PDF file was not found @ link: '{pdf_link}'")
+        except Exception as e:
+            raise RuntimeError(f"An error occurred while processing the PDF: {e}")
