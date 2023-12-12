@@ -30,15 +30,24 @@ if __name__ == "__main__":
     print(raw_store_data.info())
 
     # Cleaning Store data
-    #cleaned_store_data = data_cleaner.called_clean_store_data(raw_store_data)
+    cleaned_store_data = data_cleaner.called_clean_store_data(raw_store_data)
     
     # Printing the cleaned DataFrame
-    #print("Cleaned Store Data:")
-    #print(cleaned_store_data)
-    #print(cleaned_store_data.info())
-
+    print("Cleaned Store Data:")
+    print(cleaned_store_data)
+    print(cleaned_store_data.info())
+    
+    '''
+    print(raw_store_data['continent'].unique())
+    print(raw_store_data['country_code'].unique())
+    print(raw_store_data['store_type'].unique())
+    print(cleaned_store_data['continent'].unique())
+    print(cleaned_store_data['country_code'].unique())
+    print(cleaned_store_data['store_type'].unique())
+    '''
+    
     # Uploading DataFrame to a specified table
     table_name_to_upload = 'dim_store_details'
-    pg_connector.upload_to_db(raw_store_data, table_name_to_upload)
+    pg_connector.upload_to_db(cleaned_store_data, table_name_to_upload)
     pg_engine = pg_connector.init_db_engine()
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.\nPostgreSQL Database Engine: '{pg_engine}'")
