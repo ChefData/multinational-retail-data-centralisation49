@@ -74,59 +74,41 @@ class DataCleaning:
         email_regex_expression = r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$" 
         user_data_df['email_address_check'] = user_data_df['email_address'].map(lambda i: bool(re.match(email_regex_expression, i)))
 
-        # Check phone numbers against general regular expression
-        phone_regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
-        user_data_df['phone_number_check'] = user_data_df['phone_number'].map(lambda i: bool(re.match(phone_regex_expression, i)))
+        # Check phone numbers against international regular expression
+        #phone_regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
+        #user_data_df['phone_number_check'] = user_data_df['phone_number'].map(lambda i: bool(re.match(phone_regex_expression, i)))
         
-        '''
         # Check German phone numbers against country specific regular expression
-        de_phone_regex_expression = '(\(?([\d \-\)\–\+\/\(]+){6,}\)?([ .\-–\/]?)([\d]+))'
-        user_data_df.loc[de_mask, 'phone_number3']  = user_data_df.loc[de_mask, 'phone_number2'].map(lambda i: bool(re.match(de_phone_regex_expression, i)))
+        de_phone_regex_expression = '(\(?([\d \-\)\-\+\/\(]+){6,}\)?([ .\--\/]?)([\d]+))'
+        user_data_df.loc[de_mask, 'phone_number_check'] = user_data_df.loc[de_mask, 'phone_number'].map(lambda i: bool(re.match(de_phone_regex_expression, i)))
         
         # Check American phone numbers against country specific regular expression
-        s_phone_regex_expression = '(\d{3}[-\.\s]\d{3}[-\.\s]\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]\d{4}|\d{3}[-\.\s]\d{4})'
-        user_data_df.loc[us_mask, 'phone_number_check']  = user_data_df.loc[us_mask, 'phone_number'].map(lambda i: bool(re.match(us_phone_regex_expression, i)))
-        '''
+        us_phone_regex_expression = '^(?:\+?1[-\.\s]?)?\(?([2-9][0-8][0-9])\)?[-\.\s]?([2-9][0-9]{2})[-\.\s]?([0-9]{4})$'
+        user_data_df.loc[us_mask, 'phone_number_check'] = user_data_df.loc[us_mask, 'phone_number'].map(lambda i: bool(re.match(us_phone_regex_expression, i)))
+        
+        # Check British phone numbers against country specific regular expression
+        gb_phone_regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
+        #gb_phone_regex_expression = '^((((\(?0\d{4}\)?\s?\d{3}\s?\d{3})|(\(?0\d{3}\)?\s?\d{3}\s?\d{4})|(\(?0\d{2}\)?\s?\d{4}\s?\d{4}))(\s?\(\d{4}|\d{3}))?)|((\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3})|((((\+44\s?\d{4}|\(?0\d{4}\)?)\s?\d{3}\s?\d{3})|((\+44\s?\d{3}|\(?0\d{3}\)?)\s?\d{3}\s?\d{4})|((\+44\s?\d{2}|\(?0\d{2}\)?)\s?\d{4}\s?\d{4}))(\s?\(\d{4}|\d{3}))?$'
+        user_data_df.loc[gb_mask, 'phone_number_check'] = user_data_df.loc[gb_mask, 'phone_number'].map(lambda i: bool(re.match(gb_phone_regex_expression, i)))
 
         # Check if the phone number has exactly 10 digits and country code is 'US'
         mask = (user_data_df['country_code'] == 'US') & user_data_df['phone_number'].str.match('^\d{10}$')
         # Format the phone numbers with parentheses and hyphen if they have exactly 10 digits and country code is 'US'
         user_data_df.loc[mask, 'phone_number'] = user_data_df.loc[mask, 'phone_number'].str.replace('(\d{3})(\d{3})(\d{4})', r'(\1) \2-\3', regex=True)
 
-        # Convert dtata types
+        # Convert data types
         make_string = ['first_name', 'last_name', 'email_address', 'address', 'phone_number', 'phone_extension', 'user_uuid']
-        user_data_df[make_string] = user_data_df[make_string].astype('string')
-
-        # Convert dtata types
         make_category = ['company', 'country', 'country_code']
+        user_data_df[make_string] = user_data_df[make_string].astype('string')
         user_data_df[make_category] = user_data_df[make_category].astype('category')
+        user_data_df['phone_number_check'] = user_data_df['phone_number_check'].astype('bool')
 
-        # Return cleaner DataFrame
+        # Reorder columns
+        reorder_columns = ['first_name', 'last_name', 'date_of_birth', 'company', 'address', 'country', 'country_code', 'user_uuid', 'join_date', 'email_address', 'email_address_check', 'phone_number', 'phone_extension', 'phone_number_check']
+        user_data_df = user_data_df.reindex(columns=reorder_columns)
+
+        # Return cleaned DataFrame
         return user_data_df
-
-        '''     
-        # Reset index
-        #user_data_df = user_data_df.set_index('index')
-        
-        # Handling incorrectly typed values
-        user_data_df['numeric_column'] = pd.to_numeric(user_data_df['numeric_column'], errors='coerce')
-
-          
-        # Handling rows filled with the wrong information (you may need to customize this based on your data)
-        user_data_df = user_data_df[user_data_df['column_condition'] == 'desired_condition']
-
-        # Remove rows with incorrectly typed values (e.g., non-numeric in a numeric column)
-        user_data_df = user_data_df.drop(752)
-
-        # Remove rows with incorrectly typed values (e.g., non-numeric in a numeric column)
-        user_data_df = user_data_df.dropna(subset=['numeric_column'])
-
-        # Replace missing values with None
-        #user_data_df.fillna(value=0)
-
-        # Drop duplicate values
-        #user_data_df.drop_duplicates(subset=None, keep='first', inplace=False, ignore_index=False)
-        '''
     
     def clean_card_data(self, card_data_df):
         # Handling NULL values
@@ -146,7 +128,11 @@ class DataCleaning:
         card_data_df['expiry_date'] = pd.to_datetime(card_data_df['expiry_date'], format="%m/%y", errors='coerce')
         card_data_df['date_payment_confirmed'] = pd.to_datetime(card_data_df['date_payment_confirmed'], format="%Y-%m-%d", errors='coerce')
         
-        # Return cleaner DataFrame
+        # Convert data types
+        card_data_df['card_number'] = card_data_df['card_number'].astype('string')
+        card_data_df['card_provider'] = card_data_df['card_provider'].astype('category')
+
+        # Return cleaned DataFrame
         return card_data_df
     
     def called_clean_store_data(self, store_data_df):
@@ -162,6 +148,9 @@ class DataCleaning:
         
         # Handling incorrectly typed values
         store_data_df['continent'] = store_data_df['continent'].str.replace('ee', '')
+        
+        # Remove letters from int column
+        store_data_df['staff_numbers'] = store_data_df['staff_numbers'].apply(lambda x: ''.join(char for char in x if char.isdigit()))
 
         # Handling errors with dates
         store_data_df['opening_date'] = pd.to_datetime(store_data_df['opening_date'], format='mixed', errors='coerce')
@@ -181,6 +170,40 @@ class DataCleaning:
         reorder_columns = ['store_code', 'store_type', 'opening_date', 'staff_numbers', 'address', 'locality', 'country_code', 'continent', 'latitude', 'longitude', 'latitude_check', 'longitude_check']
         store_data_df = store_data_df.reindex(columns=reorder_columns)
 
-        # Return cleaner DataFrame
-        return store_data_df
+        # Convert data types
+        make_string = ['store_code', 'address', 'locality']
+        make_category = ['store_type', 'country_code', 'continent']
+        make_interger = ['latitude', 'longitude']
+        store_data_df[make_string] = store_data_df[make_string].astype('string')
+        store_data_df[make_category] = store_data_df[make_category].astype('category')
+        store_data_df[make_interger] = store_data_df[make_interger].astype('int')
 
+        # Return cleaned DataFrame
+        return store_data_df
+    
+
+
+        '''
+        The following are further data cleaning examples that were not used during this process:
+
+        # Reset index
+        #user_data_df = user_data_df.set_index('index')
+        
+        # Handling incorrectly typed values
+        user_data_df['numeric_column'] = pd.to_numeric(user_data_df['numeric_column'], errors='coerce')
+          
+        # Handling rows filled with the wrong information
+        user_data_df = user_data_df[user_data_df['column_condition'] == 'desired_condition']
+
+        # Remove rows with incorrectly typed values (e.g., non-numeric in a numeric column)
+        user_data_df = user_data_df.drop()
+
+        # Remove rows with incorrectly typed values (e.g., non-numeric in a numeric column)
+        user_data_df = user_data_df.dropna(subset=['numeric_column'])
+
+        # Replace missing values with None
+        #user_data_df.fillna(value=0)
+
+        # Drop duplicate values
+        #user_data_df.drop_duplicates(subset=None, keep='first', inplace=False, ignore_index=False)
+        '''
