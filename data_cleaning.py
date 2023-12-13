@@ -181,6 +181,70 @@ class DataCleaning:
         # Return cleaned DataFrame
         return store_data_df
     
+    def convert_product_weights(self, product_data_df):
+        # Extract numeric values and units
+        weight_components = product_data_df['weight'].str.extract(r'(\d+\.\d*|\d*\.\d+|\d+)\s*(?:x\s*(\d+\.\d*|\d*\.\d+|\d+))?\s*([a-zA-Z]+)')
+
+        # Convert the numeric values to numeric type
+        weight_components[[0, 1]] = weight_components[[0, 1]].apply(pd.to_numeric, errors='coerce')
+        
+        # Multiply the two columns to get the final weight
+        weight_components['weight'] = np.where(weight_components[1].notna(), weight_components[0] * weight_components[1], weight_components[0])
+
+        # Convert units to kg
+        weight_components.loc[weight_components[2] ==  'g', 'weight'] /= 1000
+        weight_components.loc[weight_components[2] == 'ml', 'weight'] /= 1000
+        weight_components.loc[weight_components[2] == 'oz', 'weight'] /= 35.27396195
+
+        # Drop unnecessary columns
+        product_data_df['weight'] = weight_components['weight'].to_frame()
+
+        return product_data_df
+
+    def clean_products_data(self, product_data_df):
+        # Reset index
+        product_data_df = product_data_df.set_index('Unnamed: 0')
+
+        # Handling NULL values
+        product_data_df = product_data_df.dropna()
+        
+        # Drop duplicate values
+        product_data_df = product_data_df.drop_duplicates(subset=None, keep='first', ignore_index=False)
+
+        # Handling incorrectly entered rows
+        mask = product_data_df['product_price'].apply(lambda x: pd.notna(x) and not any(c.isalpha() for c in str(x)))
+        product_data_df = product_data_df[mask]
+
+        # Check international article number against  regular expression
+        ean_regex_expression = '^(?:\d{8}|\d{12}|\d{13}|\d{14})$'
+        product_data_df['int_article_no_check'] = product_data_df['EAN'].map(lambda i: bool(re.match(ean_regex_expression, i)))
+
+        # Check product code against regular expression
+        pc_regex_expression = '[a-zA-Z]\d-[0-9]+[a-zA-Z]?'
+        product_data_df['product_code_check'] = product_data_df['product_code'].map(lambda i: bool(re.match(pc_regex_expression, i)))
+
+        # Check Universally Unique Identifier against regular expression
+        uuid_regex_expression = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        product_data_df['uuid_check'] = product_data_df['uuid'].map(lambda i: bool(re.match(uuid_regex_expression, i)))
+
+        # Handling errors with dates
+        product_data_df['date_added'] = pd.to_datetime(product_data_df['date_added'], format='mixed', errors='coerce')
+
+        # Removing £ sign
+        product_data_df['product_price'] = product_data_df['product_price'].replace({'\£': ''}, regex=True)
+
+        # Rename columns
+        product_data_df.rename(columns={'product_price': 'product_price_£', 'EAN': 'int_article_no', 'weight': 'weight_kg'}, inplace=True)
+
+        # Convert data types
+        make_string = ['product_name', 'int_article_no', 'uuid', 'product_code']
+        make_category = ['category', 'removed']
+        make_float = ['product_price_£']
+        product_data_df[make_string] = product_data_df[make_string].astype('string')
+        product_data_df[make_category] = product_data_df[make_category].astype('category')
+        product_data_df[make_float] = product_data_df[make_float].astype('float')
+
+        return product_data_df
 
 
         '''
