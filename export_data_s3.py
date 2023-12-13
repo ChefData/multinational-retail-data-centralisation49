@@ -29,20 +29,21 @@ if __name__ == "__main__":
     raw_s3_data = data_extractor.extract_from_s3(s3_address)
 
     # Printing the original DataFrame
-    print("S3 Data DataFrame:")
-    print(raw_s3_data)
-    print(raw_s3_data.info())
+    #print("S3 Data DataFrame:")
+    #print(raw_s3_data)
+    #print(raw_s3_data.info())
 
     # Cleaning S3 data
-    #cleaned_s3_data = data_cleaner.'extract_from_s3'(raw_s3_data)
-    
+    converted_s3_data = data_cleaner.convert_product_weights(raw_s3_data)
+    cleaned_s3_data = data_cleaner.clean_products_data(converted_s3_data)
+
     # Printing the cleaned DataFrame
-    #print("Cleaned S3 Data:")
-    #print(cleaned_s3_data)
-    #print(cleaned_s3_data.info())
+    print("Cleaned S3 Data:")
+    print(cleaned_s3_data)
+    print(cleaned_s3_data.info())
 
     # Uploading DataFrame to a specified table
-    table_name_to_upload = 'raw_products2'
-    pg_connector.upload_to_db(raw_s3_data, table_name_to_upload)
+    table_name_to_upload = 'dim_products'
+    pg_connector.upload_to_db(cleaned_s3_data, table_name_to_upload)
     pg_engine = pg_connector.init_db_engine()
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.\nPostgreSQL Database Engine: '{pg_engine}'")
