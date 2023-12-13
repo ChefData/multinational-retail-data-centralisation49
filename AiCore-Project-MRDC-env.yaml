@@ -6,6 +6,8 @@ dependencies:
   - asttokens=2.0.5=pyhd3eb1b0_0
   - backcall=0.2.0=pyhd3eb1b0_0
   - blas=1.0=mkl
+  - boto3=1.29.1=py311hecd8cb5_0
+  - botocore=1.32.1=py311hecd8cb5_0
   - bottleneck=1.3.5=py311hb9e55a9_0
   - brotli-python=1.0.9=py311hcec6c5f_7
   - bzip2=1.0.8=h1de35cc_0
@@ -25,6 +27,7 @@ dependencies:
   - ipykernel=6.25.0=py311h85bffb1_0
   - ipython=8.15.0=py311hecd8cb5_0
   - jedi=0.18.1=py311hecd8cb5_1
+  - jmespath=1.0.1=py311hecd8cb5_0
   - jupyter_client=8.6.0=py311hecd8cb5_0
   - jupyter_core=5.5.0=py311hecd8cb5_0
   - krb5=1.20.1=h428f121_1
@@ -70,6 +73,7 @@ dependencies:
   - pyzmq=25.1.0=py311hcec6c5f_0
   - readline=8.2=hca72f7f_0
   - requests=2.31.0=py311hecd8cb5_0
+  - s3transfer=0.7.0=py311hecd8cb5_0
   - setuptools=68.0.0=py311hecd8cb5_0
   - six=1.16.0=pyhd3eb1b0_1
   - sqlalchemy=2.0.21=py311h6c40b1e_0
