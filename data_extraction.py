@@ -1,6 +1,8 @@
 import pandas as pd
 import tabula
 import requests
+import boto3
+from botocore.exceptions import NoCredentialsError, ClientError
 
 
 class DataExtractor:
@@ -101,3 +103,26 @@ class DataExtractor:
             return df
         except requests.exceptions.RequestException as e:
             raise requests.exceptions.RequestException(f"Error retrieving store data: {e}")
+        
+    def extract_from_s3(self, s3_address):
+        try:
+            # Create connection to S3 using default config and all buckets within S3. 's3' is a key word.
+            s3 = boto3.client('s3')
+            
+            # Extract bucket and key from S3 address
+            bucket, key = s3_address.replace('s3://', '').split('/', 1)
+
+           # Get object and file (key) from bucket
+            response = s3.get_object(Bucket= bucket, Key= key) 
+
+            # Create a DataFrame from S3 csv file. 'Body' is a key word
+            df = pd.read_csv(response['Body'])
+            return df
+        
+        except NoCredentialsError as e:
+            raise NoCredentialsError(f"AWS credentials not found. Please configure your credentials: {e}")
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                raise ClientError("The specified bucket does not exist: {e}")
+            else:
+                raise ClientError("An error occurred: {e}")
