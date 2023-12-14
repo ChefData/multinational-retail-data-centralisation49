@@ -246,6 +246,14 @@ class DataCleaning:
 
         return product_data_df
 
+    def clean_orders_data(self, orders_data_df):
+        # Reset index
+        orders_data_df = orders_data_df.set_index('level_0')
+
+        # Drop columns
+        orders_data_df.drop(["first_name", "last_name", "1"], axis="columns", inplace=True)
+
+        return orders_data_df
 
         '''
         The following are further data cleaning examples that were not used during this process:
