@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # Endpoints
     number_stores_endpoint = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores'
-    store_endpoint_template =  'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/{}'
+    store_endpoint_template = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/{}'
 
     # Get the number of stores
     number_stores = data_extractor.list_number_of_stores(number_stores_endpoint)
