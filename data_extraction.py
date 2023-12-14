@@ -3,6 +3,7 @@ import tabula
 import requests
 import boto3
 from botocore.exceptions import NoCredentialsError, ClientError
+import json
 
 
 class DataExtractor:
@@ -116,7 +117,24 @@ class DataExtractor:
             response = s3.get_object(Bucket= bucket, Key= key) 
 
             # Create a DataFrame from S3 csv file. 'Body' is a key word
-            df = pd.read_csv(response['Body'])
+            data = response['Body']
+
+            # Check if the data is in CSV format based on file extension
+            if s3_address.endswith('.csv'):
+                df = pd.read_csv(data)
+            
+            # Check if the data is in JSON format based on file extension
+            elif s3_address.endswith('.json'):
+                # Read the content of the StreamingBody as bytes
+                data_read = data.read()
+                # Decode the bytes into a string (assuming it's in utf-8 encoding)
+                data_str = data_read.decode('utf-8')
+                # Parse the string as JSON and create a DataFrame
+                df = pd.DataFrame(json.loads(data_str))
+
+            # Handle other formats or raise an error if needed
+            else:
+                raise ValueError(f"Unsupported file format for S3 address: {s3_address}")
             return df
         
         except NoCredentialsError as e:
