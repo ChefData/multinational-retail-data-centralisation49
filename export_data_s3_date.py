@@ -46,16 +46,7 @@ if __name__ == "__main__":
     print(cleaned_date_data.info())
 
     # Uploading DataFrame to a specified table
-    table_name_to_upload = 'raw_date_times'
+    table_name_to_upload = 'dim_date_times'
     pg_connector.upload_to_db(cleaned_date_data, table_name_to_upload)
     pg_engine = pg_connector.init_db_engine()
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.\nPostgreSQL Database Engine: '{pg_engine}'")
-
-    '''
-    print(raw_store_data['continent'].unique())
-    print(raw_store_data['country_code'].unique())
-    print(raw_store_data['store_type'].unique())
-    print(cleaned_store_data['continent'].unique())
-    print(cleaned_store_data['country_code'].unique())
-    print(cleaned_store_data['store_type'].unique())
-    '''
