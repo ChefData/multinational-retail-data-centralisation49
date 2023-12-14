@@ -255,6 +255,26 @@ class DataCleaning:
 
         return orders_data_df
 
+    def clean_date_data(self, date_data_df):
+        # Handling incorrectly entered rows
+        mask = date_data_df['month'].apply(lambda x: pd.notna(x) and not any(c.isalpha() for c in str(x)))
+        date_data_df = date_data_df[mask]
+        
+        # Handling errors with dates
+        date_data_df['date_time'] = pd.to_datetime(date_data_df[['year', 'month', 'day']].astype(str).agg('-'.join, axis=1) + ' ' + date_data_df['timestamp'], errors='coerce')
+
+        # Convert data types
+        make_string = ['date_uuid', 'time_period']
+        date_data_df[make_string] = date_data_df[make_string].astype('string')
+
+        # Drop columns
+        date_data_df.drop(['month', 'year', 'day', 'timestamp'], axis="columns", inplace=True)
+
+        # Reorder columns
+        date_data_df['time_period'] = date_data_df.pop('time_period')
+
+        return date_data_df
+
         '''
         The following are further data cleaning examples that were not used during this process:
 
