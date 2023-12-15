@@ -1,12 +1,12 @@
-import pandas as pd
 import numpy  as np
+import pandas as pd
 
 
 class DataCleaning:
     """
     A class containing static methods for cleaning and preprocessing various types of data.
 
-    Methods:
+    Public Methods:
     - clean_user_data(user_data_df: pd.DataFrame) -> pd.DataFrame:
         Clean and preprocess user data DataFrame.
 
