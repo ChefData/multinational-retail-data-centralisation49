@@ -1,110 +1,164 @@
-import yaml
-from sqlalchemy import create_engine, inspect, pool
+# Import necessary modules from SQLAlchemy, urllib, and PyYAML for database operations
+from sqlalchemy import create_engine, inspect, URL
 from sqlalchemy.exc import SQLAlchemyError
+import urllib.parse
+import yaml
 
+# Define a class for handling database connections and operations
 class DatabaseConnector:
     """
-    A class for connecting to databases using SQLAlchemy.
+    A class for connecting to a database, reading database credentials from a YAML file,
+    creating a database URL, initializing a SQLAlchemy engine, and performing database operations.
 
     Attributes:
-        - db_engine: SQLAlchemy engine for the main database connection.
+    - db_creds_file (str): Path to the YAML file containing database credentials.
+    - db_engine (sqlalchemy.engine.Engine): SQLAlchemy engine for database operations.
+
+    Private Methods:
+    - __init__(self, db_creds_file: str) -> None:
+        Initializes a DatabaseConnector object.
+
+    - __read_db_creds(self) -> dict:
+        Reads and returns the database credentials from the specified YAML file.
+
+    - __create_db_url(self) -> URL:
+        Creates a SQLAlchemy database URL based on the provided database credentials.
+
+    Protected Methods:
+    - _init_db_engine(self) -> create_engine:
+        Initializes and returns a SQLAlchemy engine using the database URL.
+    
+    Public Methods:
+    - list_db_tables(self) -> list:
+        Lists the names of tables in the connected database.
+
+    - upload_to_db(self, df: pd.DataFrame, table_name: str) -> None:
+        Uploads a Pandas DataFrame to the specified table in the connected database.
+
     """
 
-    def __init__(self, db_creds_file):
+    def __init__(self, db_creds_file: str) -> None:
         """
-        Initialize the DatabaseConnector.
+        Initializes a DatabaseConnector object.
 
         Parameters:
-            - db_creds_file (str): Path to the YAML file containing database credentials.
+        - db_creds_file (str): Path to the YAML file containing database credentials.
         """
+        # Constructor that takes the path to a YAML file containing database credentials
         self.db_creds_file = db_creds_file
-        self.db_engine = self.init_db_engine()
-
-    def read_db_creds(self):
+        # Initialize the database engine upon instantiation
+        self.db_engine = self._init_db_engine()
+    
+    def __read_db_creds(self) -> dict:
         """
-        Read database credentials from the YAML file.
+        Reads and returns the database credentials from the specified YAML file.
 
         Returns:
-            dict: Database credentials.
-        
+        - dict: Database credentials.
+
         Raises:
-            FileNotFoundError: If the YAML file is not found.
-            yaml.YAMLError: If there is an issue loading YAML from the file.
+        - FileNotFoundError: If the specified credentials file is not found.
+        - yaml.YAMLError: If there is an error loading YAML from the file.
         """
         try:
+            # Read the database credentials from the YAML file
             with open(self.db_creds_file, 'r') as file:
                 return yaml.safe_load(file)
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"Warning: database credentials file '{self.db_creds_file}' not found: {e}")
-        except yaml.YAMLError as e:
-            raise yaml.YAMLError(f"Error: Unable to load YAML from '{self.db_creds_file}': {e}")
+        # Handle file not found error
+        except FileNotFoundError as error:
+            raise FileNotFoundError(f"Error: database credentials file '{self.db_creds_file}' not found: {error}")
+        # Handle YAML parsing error
+        except yaml.YAMLError as error:
+            raise yaml.YAMLError(f"Error: Unable to load YAML from '{self.db_creds_file}': {error}")
 
-    def create_db_url(self):
+    def __create_db_url(self) -> URL:
         """
-        Creates a database URL from the provided credentials.
+        Creates a SQLAlchemy database URL based on the provided database credentials.
 
         Returns:
-            str: Database URL for SQLAlchemy engine.
+        - sqlalchemy.engine.url.URL: SQLAlchemy database URL.
 
         Raises:
-            ValueError: If database credentials are missing or incomplete.
+        - ValueError: If required database credentials are missing or incomplete.
         """
         try:
-            db_creds = self.read_db_creds()
+            # Read database credentials from the YAML file
+            db_creds = self.__read_db_creds()
+            # Check if all required keys are present in the credentials
             required_keys = ['DRIVER', 'USER', 'PASSWORD', 'HOST', 'PORT', 'DATABASE']
             if any(key not in db_creds for key in required_keys):
                 raise ValueError("Error: Database credentials are missing or incomplete.")
-            return f"{db_creds['DRIVER']}://{db_creds['USER']}:{db_creds['PASSWORD']}@{db_creds['HOST']}:{db_creds['PORT']}/{db_creds['DATABASE']}"
-        except ValueError as e:
-            raise ValueError(f"Error creating database URL: {e}")
+            # Create a SQLAlchemy URL object
+            url_object = URL.create(
+                drivername=db_creds['DRIVER'],
+                username=db_creds['USER'],
+                password=urllib.parse.quote_plus(db_creds['PASSWORD']),
+                host=db_creds['HOST'],
+                port=db_creds['PORT'],
+                database=db_creds['DATABASE'],
+            )
+            return url_object
+        # Handle any errors that may occur during URL creation
+        except ValueError as error:
+            raise ValueError(f"Error creating database URL: {error}")
 
-    def init_db_engine(self):
+    def _init_db_engine(self) -> create_engine:
         """
-        Reads database credentials, initializes, and returns a SQLAlchemy database engine.
+        Initializes and returns a SQLAlchemy engine using the database URL.
 
         Returns:
-            sqlalchemy.engine.base.Engine: SQLAlchemy database engine.
+        - sqlalchemy.engine.Engine: SQLAlchemy engine for database operations.
 
         Raises:
-            SQLAlchemyError: If there is an error initializing the database engine.
+        - SQLAlchemyError: If there is an error initializing the database engine.
         """
         try:
-            db_url = self.create_db_url()
-            engine_params = {'pool_size': 5, 'poolclass': pool.QueuePool}
-            return create_engine(db_url, **engine_params)
-        except SQLAlchemyError as e:
-            raise SQLAlchemyError(f"Error initializing database engine: {e}")
+            # Create a database URL
+            db_url = self.__create_db_url()
+            # Initialize the database engine
+            engine = create_engine(db_url)
+            return engine
+        # Handle any errors that may occur during engine initialization
+        except SQLAlchemyError as error:
+            raise SQLAlchemyError(f"Error initializing database engine: {error}")
 
-    def list_db_tables(self):
+    def list_db_tables(self) -> list:
         """
-        Get a list of tables in the main database.
+        Lists the names of tables in the connected database.
 
         Returns:
-            list: List of table names in the database.
+        - list: Names of tables in the database.
 
         Raises:
-            SQLAlchemyError: If there is an error listing database tables.
+        - SQLAlchemyError: If there is an error listing database tables.
         """
         try:
+            # Establish a connection to the database engine
             with self.db_engine.connect() as connection:
+                # Use the inspector to get a list of table names
                 inspector = inspect(connection)
-                return inspector.get_table_names()
-        except SQLAlchemyError as e:
-            raise SQLAlchemyError(f"Error listing database tables: {e}")
+                table_names = inspector.get_table_names()
+                return table_names
+        # Handle any errors that may occur during table listing
+        except SQLAlchemyError as error:
+            raise SQLAlchemyError(f"Error listing database tables: {error}")
 
-    def upload_to_db(self, df, table_name):
+    def upload_to_db(self, df, table_name) -> None:
         """
-        Upload a DataFrame to a specified table in the local database.
+        Uploads a Pandas DataFrame to the specified table in the connected database.
 
         Parameters:
-            - df (pd.DataFrame): DataFrame to upload.
-            - table_name (str): Name of the table in the database.
+        - df (pd.DataFrame): DataFrame to be uploaded.
+        - table_name (str): Name of the table in the database.
 
         Raises:
-            SQLAlchemyError: If there is an error uploading the DataFrame to the database.
+        - SQLAlchemyError: If there is an error uploading the DataFrame to the database.
         """
         try:
+            # Establish a connection to the database engine
             with self.db_engine.connect() as connection:
+                # Use the to_sql method to upload the DataFrame to the specified table
                 df.to_sql(table_name, connection, if_exists='replace', index=False)
-        except SQLAlchemyError as e:
-            raise SQLAlchemyError(f"Error uploading DataFrame to database: {e}")
+        # Handle any errors that may occur during DataFrame upload
+        except SQLAlchemyError as error:
+            raise SQLAlchemyError(f"Error uploading DataFrame to database: {error}")
