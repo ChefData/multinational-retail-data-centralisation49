@@ -3,9 +3,43 @@ import numpy  as np
 
 
 class DataCleaning:
+    """
+    A class containing static methods for cleaning and preprocessing various types of data.
+
+    Methods:
+    - clean_user_data(user_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess user data DataFrame.
+
+    - clean_card_data(card_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess card data DataFrame.
+
+    - called_clean_store_data(store_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess store data DataFrame.
+
+    - convert_product_weights(product_data_df: pd.DataFrame) -> pd.DataFrame:
+        Convert product weights to a standardized unit (kilograms).
+
+    - clean_products_data(product_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess product data DataFrame.
+
+    - clean_orders_data(orders_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess orders data DataFrame.
+
+    - clean_date_data(date_data_df: pd.DataFrame) -> pd.DataFrame:
+        Clean and preprocess date data DataFrame.
+    """
 
     @staticmethod
-    def clean_user_data(user_data_df):
+    def clean_user_data(user_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess user data DataFrame.
+
+        Parameters:
+        - user_data_df (pd.DataFrame): Input DataFrame containing user data.
+
+        Returns:
+        - pd.DataFrame: Cleaned user data DataFrame.
+        """
         # Handling incorrectly typed values
         user_data_df = user_data_df.replace({'country_code': {'GGB': 'GB'}, 'email_address': {'@@': '@', 'ä': 'a'}}, regex=True)
 
@@ -68,7 +102,16 @@ class DataCleaning:
         return user_data_df
     
     @staticmethod    
-    def clean_card_data(card_data_df):
+    def clean_card_data(card_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess card data DataFrame.
+
+        Parameters:
+        - card_data_df (pd.DataFrame): Input DataFrame containing card data.
+
+        Returns:
+        - pd.DataFrame: Cleaned card data DataFrame.
+        """
         # Handling NULL values
         card_data_df = card_data_df.dropna()
 
@@ -91,7 +134,16 @@ class DataCleaning:
         return card_data_df
     
     @staticmethod    
-    def called_clean_store_data(store_data_df):
+    def called_clean_store_data(store_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess store data DataFrame.
+
+        Parameters:
+        - store_data_df (pd.DataFrame): Input DataFrame containing store data.
+
+        Returns:
+        - pd.DataFrame: Cleaned store data DataFrame.
+        """
         # Reset index
         store_data_df = store_data_df.set_index('index')
         
@@ -143,7 +195,16 @@ class DataCleaning:
         return store_data_df
     
     @staticmethod    
-    def convert_product_weights(product_data_df):
+    def convert_product_weights(product_data_df) -> pd.DataFrame:
+        """
+        Convert product weights to a standardized unit (kilograms).
+
+        Parameters:
+        - product_data_df (pd.DataFrame): Input DataFrame containing product data.
+
+        Returns:
+        - pd.DataFrame: DataFrame with weights converted to kilograms.
+        """
         # Extract numeric values and units
         weight_components = product_data_df['weight'].str.extract(r'(\d+\.\d*|\d*\.\d+|\d+)\s*(?:x\s*(\d+\.\d*|\d*\.\d+|\d+))?\s*([a-zA-Z]+)')
 
@@ -168,7 +229,16 @@ class DataCleaning:
         return product_data_df
 
     @staticmethod    
-    def clean_products_data(product_data_df):
+    def clean_products_data(product_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess product data DataFrame.
+
+        Parameters:
+        - product_data_df (pd.DataFrame): Input DataFrame containing product data.
+
+        Returns:
+        - pd.DataFrame: Cleaned product data DataFrame.
+        """
         # Reset index
         product_data_df = product_data_df.set_index('Unnamed: 0')
 
@@ -214,7 +284,16 @@ class DataCleaning:
         return product_data_df
 
     @staticmethod    
-    def clean_orders_data(orders_data_df):
+    def clean_orders_data(orders_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess orders data DataFrame.
+
+        Parameters:
+        - orders_data_df (pd.DataFrame): Input DataFrame containing orders data.
+
+        Returns:
+        - pd.DataFrame: Cleaned orders data DataFrame.
+        """
         # Reset index
         orders_data_df.set_index('level_0', inplace=True)
 
@@ -225,7 +304,16 @@ class DataCleaning:
         return orders_data_df
 
     @staticmethod    
-    def clean_date_data(date_data_df):
+    def clean_date_data(date_data_df) -> pd.DataFrame:
+        """
+        Clean and preprocess date data DataFrame.
+
+        Parameters:
+        - date_data_df (pd.DataFrame): Input DataFrame containing date data.
+
+        Returns:
+        - pd.DataFrame: Cleaned date data DataFrame.
+        """
         # Handling incorrectly entered rows
         date_data_df = date_data_df[~date_data_df['month'].astype(str).str.contains('[a-zA-Z]')]
 
@@ -243,4 +331,3 @@ class DataCleaning:
 
         # Return cleaned DataFrame
         return date_data_df
-    
