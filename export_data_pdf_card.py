@@ -2,6 +2,7 @@ from data_cleaning import DataCleaning
 from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
 
+
 if __name__ == "__main__":
     # Creating Class instances
     data_cleaner = DataCleaning()
@@ -27,5 +28,4 @@ if __name__ == "__main__":
     # Uploading DataFrame to a specified table
     table_name_to_upload = 'dim_card_details'
     pg_connector.upload_to_db(cleaned_card_data, table_name_to_upload)
-    pg_engine = pg_connector.init_db_engine()
-    print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.\nPostgreSQL Database Engine: '{pg_engine}'")
+    print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.")
