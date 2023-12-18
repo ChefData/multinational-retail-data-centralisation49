@@ -8,7 +8,7 @@ import yaml
 class DatabaseConnector:
     """
     A class for connecting to a database, reading database credentials from a YAML file,
-    creating a database URL, initializing a SQLAlchemy engine, and performing database operations.
+    creating a database URL, initialising a SQLAlchemy engine, and performing database operations.
 
     Attributes:
     - db_creds_file (str): Path to the YAML file containing database credentials.
@@ -16,7 +16,7 @@ class DatabaseConnector:
 
     Private Methods:
     - __init__(self, db_creds_file: str) -> None:
-        Initializes a DatabaseConnector object.
+        Initialises a DatabaseConnector object.
 
     - __read_db_creds(self) -> dict:
         Reads and returns the database credentials from the specified YAML file.
@@ -26,7 +26,7 @@ class DatabaseConnector:
 
     Protected Methods:
     - _init_db_engine(self) -> create_engine:
-        Initializes and returns a SQLAlchemy engine using the database URL.
+        Initialises and returns a SQLAlchemy engine using the database URL.
     
     Public Methods:
     - list_db_tables(self) -> list:
@@ -39,14 +39,14 @@ class DatabaseConnector:
 
     def __init__(self, db_creds_file: str) -> None:
         """
-        Initializes a DatabaseConnector object.
+        Initialises a DatabaseConnector object.
 
         Parameters:
         - db_creds_file (str): Path to the YAML file containing database credentials.
         """
         # Constructor that takes the path to a YAML file containing database credentials
         self.db_creds_file = db_creds_file
-        # Initialize the database engine upon instantiation
+        # Initialise the database engine upon instantiation
         self.db_engine = self._init_db_engine()
     
     def __read_db_creds(self) -> dict:
@@ -104,23 +104,23 @@ class DatabaseConnector:
 
     def _init_db_engine(self) -> create_engine:
         """
-        Initializes and returns a SQLAlchemy engine using the database URL.
+        Initialises and returns a SQLAlchemy engine using the database URL.
 
         Returns:
         - sqlalchemy.engine.Engine: SQLAlchemy engine for database operations.
 
         Raises:
-        - SQLAlchemyError: If there is an error initializing the database engine.
+        - SQLAlchemyError: If there is an error initialising the database engine.
         """
         try:
             # Create a database URL
             db_url = self.__create_db_url()
-            # Initialize the database engine
+            # Initialise the database engine
             engine = create_engine(db_url)
             return engine
-        # Handle any errors that may occur during engine initialization
+        # Handle any errors that may occur during engine initialisation
         except SQLAlchemyError as error:
-            raise SQLAlchemyError(f"Error initializing database engine: {error}")
+            raise SQLAlchemyError(f"Error initialising database engine: {error}")
 
     def list_db_tables(self) -> list:
         """
