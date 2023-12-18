@@ -37,14 +37,14 @@ The project is designed to challenge me to refactor and optimise the code while 
 
 ### Lessons learned
 
-## Data Extraction
+#### Data Extraction
 - Set up and connected to a database engine
 - Read SQL tables from AWS Relational Database Service
 - Read a PDF from a link and stitched the data together into a DataFrame
 - Sent a GET request to the API endpoint 
 - Connected to AWS S3 buckets
 
-## Data Transformation
+#### Data Transformation
 - Handled incorrectly typed values using regular expressions
 - Handled errors with dates using pd.to_datetime
 - Dropped NULL values
@@ -57,10 +57,10 @@ The project is designed to challenge me to refactor and optimise the code while 
 - Used for loops to iterate over a DataFrame with a dictionary
 - Reset the index of a DataFrame
 
-## Data Load
+#### Data Load
 - Connected to a PostgreSQL database
 
-## General
+#### General
 - Created classes to encapsulate the code
 - Defined functions to abstract code
 - Set up conda environments to isolate the project dependencies
@@ -104,18 +104,21 @@ brew install git
 git clone https://github.com/ChefData/multinational-retail-data-centralisation49
 ```
 
-#### Linux
+#### Linux: Ubuntu or Debian-based systems
 1. Open the terminal.
 2. Install git:
-    - On Ubuntu or Debian-based systems:
 ```bash
 sudo apt-get update
 sudo apt-get install git
 ```
-    - On Fedora:
+
+#### Linux: Fedora
+1. Open the terminal.
+2. Install git:
 ```bash
 sudo dnf install git
 ```
+
 3. Clone the repository to your local machine:
 ```bash
 git clone https://github.com/ChefData/multinational-retail-data-centralisation49
@@ -125,7 +128,7 @@ git clone https://github.com/ChefData/multinational-retail-data-centralisation49
 
 Follow these instructions to set up and install the project on your local machine.
 
-> [!Prerequisites]
+> [!NOTE]
 > Make sure you have the following installed:
 >   - Python (version 3.11)
 >   - Conda (optional but recommended)
