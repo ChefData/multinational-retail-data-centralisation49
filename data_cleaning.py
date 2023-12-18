@@ -17,7 +17,7 @@ class DataCleaning:
         Clean and preprocess store data DataFrame.
 
     - convert_product_weights(product_data_df: pd.DataFrame) -> pd.DataFrame:
-        Convert product weights to a standardized unit (kilograms).
+        Convert product weights to a standardised unit (kilograms).
 
     - clean_products_data(product_data_df: pd.DataFrame) -> pd.DataFrame:
         Clean and preprocess product data DataFrame.
@@ -197,7 +197,7 @@ class DataCleaning:
     @staticmethod    
     def convert_product_weights(product_data_df) -> pd.DataFrame:
         """
-        Convert product weights to a standardized unit (kilograms).
+        Convert product weights to a standardised unit (kilograms).
 
         Parameters:
         - product_data_df (pd.DataFrame): Input DataFrame containing product data.
