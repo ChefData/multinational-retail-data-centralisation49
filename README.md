@@ -99,6 +99,7 @@ git clone https://github.com/ChefData/multinational-retail-data-centralisation49
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install git
 ```
+
 3. Clone the repository to your local machine:
 ```bash
 git clone https://github.com/ChefData/multinational-retail-data-centralisation49
@@ -164,6 +165,7 @@ cd multinational-retail-data-centralisation49
 ```bash
 conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3
 ```
+
     Or import the conda environment from the supplied YAML file
 ```bash
 conda env create -f AiCore-Project-MRDC-env.yml
@@ -174,6 +176,7 @@ conda env create -f AiCore-Project-MRDC-env.yml
 ```bash
 activate AiCore-Project-MRDC
 ```
+
     - On macOS and Linux:
 ```bash
 conda activate AiCore-Project-MRDC
@@ -190,6 +193,7 @@ pip install -r requirements.txt
 ```bash
 aws configure
 ```
+
     3. You will be prompted to enter the following information:
         * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
         * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
@@ -200,7 +204,8 @@ aws configure
 ```bash
 aws configure list. 
 ```
-        This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
+
+This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
 
 9. Run the following Python Scripts to download the data and import it into the SQL database:
 ```bash
