@@ -16,7 +16,7 @@ class DataExtractor:
 
     Private Methods:
     - __init__(self) -> None:
-        Initializes a DataExtractor object.
+        Initialises a DataExtractor object.
     
     Public Methods:
     - read_rds_table(self, db_connector, table_name: str) -> pd.DataFrame:
@@ -40,9 +40,9 @@ class DataExtractor:
 
     def __init__(self):
         """
-        Initializes a DataExtractor object.
+        Initialises a DataExtractor object.
         """
-        # Constructor to initialize the API key header
+        # Constructor to initialise the API key header
         self.header = None
 
     @staticmethod
@@ -51,14 +51,14 @@ class DataExtractor:
         Reads a table from a relational database and returns the data as a Pandas DataFrame.
 
         Parameters:
-        - db_connector: An object with an '_init_db_engine' method for initializing a database engine.
+        - db_connector: An object with an '_init_db_engine' method for initialising a database engine.
         - table_name (str): Name of the table in the database.
 
         Returns:
         - pd.DataFrame: Data from the specified table.
         
         Raises:
-        - RuntimeError: If there is an error initializing the database engine.
+        - RuntimeError: If there is an error initialising the database engine.
         - ValueError: If the specified table does not exist in the database.
         """
         # Get the database engine from the DatabaseConnector
@@ -66,7 +66,7 @@ class DataExtractor:
             db_engine = db_connector._init_db_engine()
         # Handle RuntimeError error
         except RuntimeError as error:
-            raise RuntimeError(f"Error initializing database engine. Check your connection settings: {error}")
+            raise RuntimeError(f"Error initialising database engine. Check your connection settings: {error}")
 
         # List tables in the database
         tables = db_connector.list_db_tables() 
