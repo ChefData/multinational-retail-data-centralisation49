@@ -194,7 +194,14 @@ class DatabaseConnector:
         except ValueError as error:
             raise ValueError(f"Error creating database connection string: {error}")
 
-    def cast_data_types(self, table_name, column_types):
+    def cast_data_types(self, table_name, column_types) -> None:
+        """
+        Casts the data types of columns in a PostgreSQL table based on the provided dictionary of column types.
+
+        Parameters:
+        - table_name (str): The name of the PostgreSQL table.
+        - column_types (dict): A dictionary where keys are column names and values are the desired data types.
+        """
         # Initialize max_lengths dictionary
         max_lengths = {}
         db_url = self.__create_psycopg2_url()
