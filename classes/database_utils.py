@@ -1,6 +1,7 @@
 # Import necessary modules from SQLAlchemy, urllib, and PyYAML for database operations
 from sqlalchemy import create_engine, inspect, URL
 from sqlalchemy.exc import SQLAlchemyError
+import psycopg2
 import urllib.parse
 import yaml
 
@@ -163,3 +164,57 @@ class DatabaseConnector:
         # Handle any errors that may occur during DataFrame upload
         except SQLAlchemyError as error:
             raise SQLAlchemyError(f"Error uploading DataFrame to database: {error}")
+
+    def __create_psycopg2_url(self) -> str:
+        """
+        Creates a PostgreSQL connection URL based on the provided database credentials.
+
+        Returns:
+        - str: PostgreSQL connection URL.
+
+        Raises:
+        - ValueError: If required database credentials are missing or incomplete.
+        """
+        try:
+            # Read database credentials from the YAML file
+            db_creds = self.__read_db_creds()
+            # Check if all required keys are present in the credentials
+            required_keys = ['USER', 'PASSWORD', 'HOST', 'PORT', 'DATABASE']
+            if any(key not in db_creds for key in required_keys):
+                raise ValueError("Error: Database credentials are missing or incomplete.")
+            # Create a connection string
+            conn_string = (
+                f"user={db_creds['USER']} "
+                f"password={urllib.parse.quote_plus(db_creds['PASSWORD'])} "
+                f"host={db_creds['HOST']} "
+                f"port={db_creds['PORT']} "
+                f"dbname={db_creds['DATABASE']}"
+            )
+            return conn_string
+        except ValueError as error:
+            raise ValueError(f"Error creating database connection string: {error}")
+
+    def cast_data_types(self, table_name, column_types):
+        # Initialize max_lengths dictionary
+        max_lengths = {}
+        db_url = self.__create_psycopg2_url()
+        # Connect to the PostgreSQL database
+        with psycopg2.connect(db_url) as conn:
+            with conn.cursor() as cur:
+                for column_name, data_type in column_types.items():
+                    if data_type == 'VARCHAR':
+                        # Construct the query to find the maximum length
+                        query = f"SELECT MAX(CHAR_LENGTH(CAST({column_name} AS VARCHAR))) FROM {table_name};"
+                        # Execute the query
+                        cur.execute(query)
+                        # Fetch the result
+                        max_length = cur.fetchone()[0]
+                        # Update max_lengths dictionary
+                        max_lengths[column_name] = max_length
+                        # Construct the ALTER TABLE query
+                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type}({max_length});"
+                    else:
+                        # For non-VARCHAR columns
+                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type} USING {column_name}::{data_type};"
+                    # Execute the ALTER TABLE query
+                    cur.execute(alter_query)
