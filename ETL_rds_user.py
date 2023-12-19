@@ -37,3 +37,21 @@ if __name__ == "__main__":
     table_name_to_upload = 'dim_users'
     pg_connector.upload_to_db(cleaned_user_data, table_name_to_upload)
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.")
+
+    # Cast data types - The ? in VARCHAR will be replaced with an integer representing the maximum length of the values in that column.
+    column_types = {
+        'first_name'   : 'VARCHAR(255)',
+        'last_name'    : 'VARCHAR(255)',
+        'country_code' : 'VARCHAR(?)',
+        'user_uuid'    : 'UUID' ,
+        'join_date'    : 'DATE',
+        'date_of_birth': 'DATE',
+    }
+    pg_connector.cast_data_types(table_name_to_upload, column_types)
+    print(f"Columns in '{table_name_to_upload}' table have been cast to the following data types: '{column_types}'")
+
+    # Update the respective columns as primary key
+    primary_key = 'user_uuid'
+
+    pg_connector.add_primary_key(table_name_to_upload, primary_key)
+    print(f"'{primary_key}' in '{table_name_to_upload}' designated as primary key")
