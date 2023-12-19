@@ -1,4 +1,5 @@
-# Import necessary modules from SQLAlchemy, urllib, and PyYAML for database operations
+# Import necessary modules from psycopg2, SQLAlchemy, urllib, and PyYAML for database operations
+from psycopg2 import sql
 from sqlalchemy import create_engine, inspect, URL
 from sqlalchemy.exc import SQLAlchemyError
 import psycopg2
@@ -10,7 +11,10 @@ import yaml
 class DatabaseConnector:
     """
     A class for connecting to a database, reading database credentials from a YAML file,
-    creating a database URL, initialising a SQLAlchemy engine, and performing database operations.
+    initialising a SQLAlchemy engine, performing database operations, 
+    interacting with a PostgreSQL database, providing methods for
+    creating connection URLs, casting data types, adding primary keys, and
+    adding foreign keys to tables.
 
     Attributes:
     - db_creds_file (str): Path to the YAML file containing database credentials.
@@ -26,6 +30,9 @@ class DatabaseConnector:
     - __create_db_url(self) -> URL:
         Creates a SQLAlchemy database URL based on the provided database credentials.
 
+    - __create_psycopg2_url(self) -> str:
+        Creates a PostgreSQL connection URL based on the provided database credentials.
+
     Protected Methods:
     - _init_db_engine(self) -> create_engine:
         Initialises and returns a SQLAlchemy engine using the database URL.
@@ -37,6 +44,14 @@ class DatabaseConnector:
     - upload_to_db(self, df: pd.DataFrame, table_name: str) -> None:
         Uploads a Pandas DataFrame to the specified table in the connected database.
 
+    - cast_data_types(self, table_name, column_types) -> None:
+        Casts the data types of columns in a PostgreSQL table based on the provided dictionary of column types.
+
+    - add_primary_key(self, table_name, primary_key) -> None:
+        Adds a primary key constraint to a PostgreSQL table.
+
+    - add_foreign_key(self, table_name, foreign_keys) -> None:
+        Adds foreign key constraints to a PostgreSQL table based on the provided dictionary of foreign keys.
     """
 
     def __init__(self, db_creds_file: str) -> None:
@@ -202,16 +217,19 @@ class DatabaseConnector:
         - table_name (str): The name of the PostgreSQL table.
         - column_types (dict): A dictionary where keys are column names and values are the desired data types.
         """
+        db_url = self.__create_psycopg2_url()
         # Initialize max_lengths dictionary
         max_lengths = {}
-        db_url = self.__create_psycopg2_url()
         # Connect to the PostgreSQL database
         with psycopg2.connect(db_url) as conn:
             with conn.cursor() as cur:
                 for column_name, data_type in column_types.items():
-                    if data_type == 'VARCHAR':
+                    if data_type == 'VARCHAR(?)':
                         # Construct the query to find the maximum length
-                        query = f"SELECT MAX(CHAR_LENGTH(CAST({column_name} AS VARCHAR))) FROM {table_name};"
+                        query = sql.SQL("SELECT MAX(CHAR_LENGTH(CAST({} AS VARCHAR))) FROM {};").format(
+                            sql.Identifier(column_name),
+                            sql.Identifier(table_name)
+                        )
                         # Execute the query
                         cur.execute(query)
                         # Fetch the result
@@ -219,9 +237,83 @@ class DatabaseConnector:
                         # Update max_lengths dictionary
                         max_lengths[column_name] = max_length
                         # Construct the ALTER TABLE query
-                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type}({max_length});"
+                        alter_query = sql.SQL("ALTER TABLE {} ALTER COLUMN ({}) TYPE VARCHAR({});").format(
+                            sql.Identifier(table_name),
+                            sql.Identifier(column_name),
+                            sql.Literal(max_length),
+                        )
                     else:
                         # For non-VARCHAR columns
-                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type} USING {column_name}::{data_type};"
+                        alter_query = sql.SQL("ALTER TABLE {} ALTER COLUMN ({}) TYPE {} USING {}::{};").format(
+                            sql.Identifier(table_name),
+                            sql.Identifier(column_name),
+                            sql.Identifier(data_type),
+                            sql.Identifier(column_name),
+                            sql.Identifier(data_type),
+                        )
+                    try:
+                        # Execute the ALTER TABLE query
+                        cur.execute(alter_query)
+                    except psycopg2.Error as error:
+                        conn.rollback()
+                        print(f"Error updating column {column_name} in {table_name}: {error}")
+        # Commit the connection
+        conn.commit()
+
+    def add_primary_key(self, table_name, primary_key) -> None:
+        """
+        Adds a primary key constraint to a PostgreSQL table.
+
+        Parameters:
+        - table_name (str): The name of the PostgreSQL table.
+        - primary_key (str): The column name or a comma-separated list of column names for the primary key.
+
+        Returns:
+        None
+        """
+        db_url = self.__create_psycopg2_url()
+        # Connect to the PostgreSQL database
+        with psycopg2.connect(db_url) as conn:
+            with conn.cursor() as cur:
+                # Construct the query
+                alter_query = sql.SQL("ALTER TABLE {} ADD PRIMARY KEY ({});").format(
+                    sql.Identifier(table_name),
+                    sql.Identifier(primary_key),
+                )
+                try:
                     # Execute the ALTER TABLE query
                     cur.execute(alter_query)
+                except psycopg2.Error as error:
+                    conn.rollback()
+                    print(f"Error adding primary key to {table_name}: {error}")
+        # Commit the connection
+        conn.commit()
+
+    def add_foreign_key(self, table_name, foreign_keys) -> None:
+        """
+        Adds foreign key constraints to a PostgreSQL table based on the provided dictionary of foreign keys.
+
+        Parameters:
+        - table_name (str): The name of the PostgreSQL table.
+        - foreign_keys (dict): A dictionary where keys are reference table names and values are foreign key column names.
+        """
+        db_url = self.__create_psycopg2_url()
+        # Connect to the PostgreSQL database
+        with psycopg2.connect(db_url) as conn:
+            with conn.cursor() as cur:
+                for reference_table, foreign_key in foreign_keys.items():
+                    # Construct the query to find the maximum length
+                    alter_query = sql.SQL("ALTER TABLE {} ADD FOREIGN KEY ({}) REFERENCES {}({});").format(
+                        sql.Identifier(table_name),
+                        sql.Identifier(foreign_key),
+                        sql.Identifier(reference_table),
+                        sql.Identifier(foreign_key)
+                    )
+                    try:
+                        # Execute the ALTER TABLE query
+                        cur.execute(alter_query)
+                    except psycopg2.Error as error:
+                        conn.rollback()
+                        print(f"Error adding foreign key to {table_name}: {error}")
+        # Commit the connection
+        conn.commit()
