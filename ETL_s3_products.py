@@ -9,8 +9,8 @@ if __name__ == "__main__":
     data_extractor = DataExtractor()
     pg_connector = DatabaseConnector('do_not_track/pg_creds.yaml')
 
+    # Raw Products data
     s3_address = 's3://data-handling-public/products.csv'
-
     raw_products_data = data_extractor.extract_from_s3(s3_address)
 
     # Printing the original DataFrame
