@@ -59,6 +59,9 @@ The project is designed to challenge me to refactor and optimise the code while 
 
 #### Data Load
 - Connected to a PostgreSQL database
+- Queried SQL tables with psycopg2
+- Altered data types of SQL tables with psycopg2
+- Set primary and foreign keys of SQL tables with psycopg2
 
 #### General
 - Created classes to encapsulate the code
@@ -170,7 +173,7 @@ cd multinational-retail-data-centralisation49
 
 5. Create a Conda Virtual Environment to isolate the project dependencies (Optional but Recommended)
 ```bash
-conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3
+conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3 awscli
 ```
 
 Or import the conda environment from the supplied YAML file
@@ -178,7 +181,7 @@ Or import the conda environment from the supplied YAML file
 conda env create -f AiCore-Project-MRDC-env.yml
 ```
 
-6. Activate the virtual environment:
+6. Activate the conda virtual environment:
 - On Windows:
 ```bash
 activate AiCore-Project-MRDC
@@ -204,7 +207,7 @@ aws configure
 * After entering the required information, press Enter
 * To verify that the configuration was successful, run the following command: 
 ```bash
-aws configure list. 
+aws configure list
 ```
 
 This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
@@ -212,11 +215,11 @@ This command will display the configuration settings, including the access key I
 9. Run the following Python Scripts to download the data and import it into the SQL database:
 ```bash
 python ETL_rds_user.py
-python ETL_rds_orders.py
 python ETL_s3_date.py
 python ETL_s3_products.py
 python ETL_pdf_card.py
 python ETL_api_store.py
+python ETL_rds_orders.py
 ```
 
 ## Classes and Methods
@@ -232,6 +235,7 @@ A class for connecting to a database, reading credentials from a YAML file, crea
 - __init__(self, db_creds_file: str) -> None: Initialises a DatabaseConnector object.
 - __read_db_creds(self) -> dict: Reads and returns the database credentials from the specified YAML file.
 - __create_db_url(self) -> URL: Creates a SQLAlchemy database URL based on the provided database credentials.
+- __create_psycopg2_url(self) -> str: Creates a PostgreSQL connection URL based on the provided database credentials.
 
 #### Protected Methods
 - _init_db_engine(self) -> create_engine: Initialises and returns a SQLAlchemy engine using the database URL.
@@ -239,6 +243,9 @@ A class for connecting to a database, reading credentials from a YAML file, crea
 #### Public Methods
 - list_db_tables(self) -> list: Lists the names of tables in the connected database.
 - upload_to_db(self, df: pd.DataFrame, table_name: str) -> None: Uploads a Pandas DataFrame to the specified table in the connected database.
+- cast_data_types(self, table_name, column_types) -> None: Casts the data types of columns in a PostgreSQL table based on the provided dictionary of column types.
+- add_primary_key(self, table_name, primary_key) -> None: Adds a primary key constraint to a PostgreSQL table.
+- add_foreign_key(self, table_name, foreign_keys) -> None: Adds foreign key constraints to a PostgreSQL table based on the provided dictionary of foreign keys.
 
 ### DataExtractor
 A class for extracting data from various sources such as databases, PDFs, APIs, and S3.
@@ -274,6 +281,7 @@ The project is built around three classes and the Python files needed to downloa
 
 multinational-retail-data-centralisation49/
 ├── classes/
+│ ├── __init__.py
 │ ├── database_utils.py
 │ ├── data_extraction.py
 │ └── data_cleaning.py
