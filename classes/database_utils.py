@@ -1,5 +1,4 @@
 # Import necessary modules from psycopg2, SQLAlchemy, urllib, and PyYAML for database operations
-from psycopg2 import sql
 from sqlalchemy import create_engine, inspect, URL
 from sqlalchemy.exc import SQLAlchemyError
 import psycopg2
@@ -226,10 +225,7 @@ class DatabaseConnector:
                 for column_name, data_type in column_types.items():
                     if data_type == 'VARCHAR(?)':
                         # Construct the query to find the maximum length
-                        query = sql.SQL("SELECT MAX(CHAR_LENGTH(CAST({} AS VARCHAR))) FROM {};").format(
-                            sql.Identifier(column_name),
-                            sql.Identifier(table_name)
-                        )
+                        query = f"SELECT MAX(CHAR_LENGTH(CAST({column_name} AS VARCHAR))) FROM {table_name};"
                         # Execute the query
                         cur.execute(query)
                         # Fetch the result
@@ -237,20 +233,9 @@ class DatabaseConnector:
                         # Update max_lengths dictionary
                         max_lengths[column_name] = max_length
                         # Construct the ALTER TABLE query
-                        alter_query = sql.SQL("ALTER TABLE {} ALTER COLUMN ({}) TYPE VARCHAR({});").format(
-                            sql.Identifier(table_name),
-                            sql.Identifier(column_name),
-                            sql.Literal(max_length),
-                        )
+                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE VARCHAR({max_length});"
                     else:
-                        # For non-VARCHAR columns
-                        alter_query = sql.SQL("ALTER TABLE {} ALTER COLUMN ({}) TYPE {} USING {}::{};").format(
-                            sql.Identifier(table_name),
-                            sql.Identifier(column_name),
-                            sql.Identifier(data_type),
-                            sql.Identifier(column_name),
-                            sql.Identifier(data_type),
-                        )
+                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type} USING {column_name}::{data_type};"
                     try:
                         # Execute the ALTER TABLE query
                         cur.execute(alter_query)
@@ -276,10 +261,7 @@ class DatabaseConnector:
         with psycopg2.connect(db_url) as conn:
             with conn.cursor() as cur:
                 # Construct the query
-                alter_query = sql.SQL("ALTER TABLE {} ADD PRIMARY KEY ({});").format(
-                    sql.Identifier(table_name),
-                    sql.Identifier(primary_key),
-                )
+                alter_query = f"ALTER TABLE {table_name} ADD PRIMARY KEY ({primary_key});"
                 try:
                     # Execute the ALTER TABLE query
                     cur.execute(alter_query)
@@ -303,12 +285,7 @@ class DatabaseConnector:
             with conn.cursor() as cur:
                 for reference_table, foreign_key in foreign_keys.items():
                     # Construct the query to find the maximum length
-                    alter_query = sql.SQL("ALTER TABLE {} ADD FOREIGN KEY ({}) REFERENCES {}({});").format(
-                        sql.Identifier(table_name),
-                        sql.Identifier(foreign_key),
-                        sql.Identifier(reference_table),
-                        sql.Identifier(foreign_key)
-                    )
+                    alter_query = f"ALTER TABLE {table_name} ADD FOREIGN KEY ({foreign_key}) REFERENCES {reference_table}({foreign_key});"
                     try:
                         # Execute the ALTER TABLE query
                         cur.execute(alter_query)
