@@ -324,16 +324,13 @@ class DataCleaning:
         - pd.DataFrame: Cleaned date data DataFrame.
         """
         # Handling incorrectly entered rows
-        date_data_df = date_data_df[~date_data_df['month'].astype(str).str.contains('[a-zA-Z]')]
+        date_data_df = (date_data_df.loc[~date_data_df['month'].astype(str).str.contains('[a-zA-Z]')])
+
+        # Convert data types
+        date_data_df = date_data_df.astype({'date_uuid': 'string', 'time_period': 'string',})
 
         # Handling errors with dates
         date_data_df['date_time'] = pd.to_datetime(date_data_df[['year', 'month', 'day']].astype(str).agg('-'.join, axis=1) + ' ' + date_data_df['timestamp'], errors='coerce')
-
-        # Convert data types
-        date_data_df[['date_uuid', 'time_period']] = date_data_df[['date_uuid', 'time_period']].astype('string')
-
-        # Drop columns
-        #date_data_df.drop(['month', 'year', 'day', 'timestamp'], axis='columns', inplace=True)
 
         # Reorder columns
         date_data_df = date_data_df[['date_uuid', 'date_time', 'time_period', 'month', 'year', 'day', 'timestamp']]
