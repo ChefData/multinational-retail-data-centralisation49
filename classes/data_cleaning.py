@@ -147,20 +147,21 @@ class DataCleaning:
         # Reset index
         store_data_df = store_data_df.set_index('index')
         
-        # Handling incorrectly entered rows
-        store_data_df = store_data_df[~store_data_df['longitude'].astype(str).str.contains('[a-zA-Z]')]
-
         # Drop lat column
+        #store_data_df["latitude"] = store_data_df["latitude"].combine_first(store_data_df["lat"])
         store_data_df.drop('lat', axis='columns', inplace=True, errors='ignore')
-        
-        # Handling incorrectly typed values
-        store_data_df['continent'] = store_data_df['continent'].str.replace('ee', '')
-        
-        # Remove letters from int column
-        store_data_df['staff_numbers'] = store_data_df['staff_numbers'].str.replace(r'\D', '', regex=True)
 
         # Handling errors with dates
         store_data_df['opening_date'] = pd.to_datetime(store_data_df['opening_date'], format='mixed', errors='coerce')
+        store_data_df.dropna(subset='opening_date', inplace=True)
+
+        # Handling incorrectly typed values
+        store_data_df['continent'] = store_data_df['continent'].str.replace('ee', '')
+        store_data_df['staff_numbers'] = store_data_df['staff_numbers'].str.replace(r'\D', '', regex=True)
+
+        # Replace 'N/A' with NaN in specified columns
+        columns_to_replace_na = ['latitude', 'longitude']
+        store_data_df[columns_to_replace_na] = store_data_df[columns_to_replace_na].replace('N/A', np.nan)
 
         # Rename incorrectly labeled columns
         store_data_df.rename(columns = {'latitude': 'longitude', 'longitude': 'latitude'}, inplace = True)
@@ -168,7 +169,7 @@ class DataCleaning:
         # Descriptive names for regex expressions
         lat_regex = '^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$'
         lon_regex = '^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$'
-        
+
         # Check columns against regular expression and use assign for column creation
         store_data_df = store_data_df.assign(
             latitude_check  = store_data_df['latitude'] .str.match(lat_regex),
@@ -261,14 +262,22 @@ class DataCleaning:
             uuid_check           = product_data_df['uuid']        .str.match(uuid_regex),
         )
 
+        # Adds a new column weight_class which will contain human-readable values based on the weight range of the product.
+        bins = [0, 2, 40, 140, 10000]
+        labels = ['Light', 'Mid_Sized', 'Heavy', 'Truck_Required']
+        product_data_df['weight_class'] = pd.cut(product_data_df['weight_kg'], bins=bins, right=False, labels=labels)
+
         # Handling errors with dates
         product_data_df['date_added'] = pd.to_datetime(product_data_df['date_added'], format='mixed', errors='coerce')
         
         # Consistent price handling using str.replace
         product_data_df['product_price'] = product_data_df['product_price'].str.replace('£', '').apply(pd.to_numeric, errors='coerce')
         
+        # Convert removed column into bool
+        product_data_df = product_data_df.replace({'removed': {'Still_avaliable': True, 'Removed': False}}, regex=True)
+
         # Rename columns
-        product_data_df.rename(columns={'product_price': 'product_price_£', 'EAN': 'int_article_no'}, inplace=True)
+        product_data_df.rename(columns={'product_price': 'product_price_£', 'EAN': 'int_article_no', 'removed': 'still_available'}, inplace=True)
 
         # Convert data types
         product_data_df = product_data_df.astype({
@@ -277,7 +286,7 @@ class DataCleaning:
             'uuid': 'string',
             'product_code': 'string',
             'category': 'category',
-            'removed': 'category',
+            'still_available': 'bool',
         })
 
         # Return cleaned DataFrame
@@ -324,10 +333,10 @@ class DataCleaning:
         date_data_df[['date_uuid', 'time_period']] = date_data_df[['date_uuid', 'time_period']].astype('string')
 
         # Drop columns
-        date_data_df.drop(['month', 'year', 'day', 'timestamp'], axis='columns', inplace=True)
+        #date_data_df.drop(['month', 'year', 'day', 'timestamp'], axis='columns', inplace=True)
 
         # Reorder columns
-        date_data_df = date_data_df[['date_uuid', 'date_time', 'time_period']]
+        date_data_df = date_data_df[['date_uuid', 'date_time', 'time_period', 'month', 'year', 'day', 'timestamp']]
 
         # Return cleaned DataFrame
         return date_data_df
