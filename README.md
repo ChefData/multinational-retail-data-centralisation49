@@ -139,9 +139,9 @@ Follow these instructions to set up and install the project on your local machin
 >   - Python (version 3.11)
 >   - Conda (optional but recommended)
 >   - PostgreSQL
->   - pgadmin4
+>   - pgAdmin4
 
-1. Initialise a new database locally within pgadmin4 to store the extracted data. 
+1. Initialise a new database locally within pgAdmin4 to store the extracted data. 
     - Set up the new database and name it sales_data.
     - This database will store all the company information once you extract it from various data sources.
 
@@ -272,31 +272,25 @@ A class containing static methods for cleaning and preprocessing various types o
 ## File structure of the project
 The project is built around three classes and the Python files needed to download the data:
 
-        multinational-retail-data-centralisation49/
-        |
-        |-- README.md
-        |
-        |-- AiCore-Project-MRDC-env.yaml
-        |
-        |-- .gitignore
-        |
-        |-- database_utils.py
-        |
-        |-- data_extraction.py
-        |
-        |-- data_cleaning.py
-        |
-        |-- ETL_rds_user.py
-        |
-        |-- ETL_rds_orders.py
-        |
-        |-- ETL_s3_date.py
-        |
-        |-- ETL_s3_products.py
-        |
-        |-- ETL_pdf_card.py
-        |
-        |-- ETL_api_store.py
+multinational-retail-data-centralisation49/
+├── classes/
+│ ├── database_utils.py
+│ ├── data_extraction.py
+│ └── data_cleaning.py
+├── scripts/
+│ ├── ETL_rds_user.py
+│ ├── ETL_rds_orders.py
+│ ├── ETL_s3_date.py
+│ ├── ETL_s3_products.py
+│ ├── ETL_pdf_card.py
+│ └── ETL_api_store.py
+├── do_not_track/ 
+│ ├── pg_creds.yaml
+│ └── db_creds.yaml
+├── docs/
+│ └── AiCore-Project-MRDC-env.yaml
+├── .gitignore
+└── README.md
 
 ## Tools Used
 - Visual Studio Code: Code editor used for development.
@@ -311,7 +305,7 @@ The project is built around three classes and the Python files needed to downloa
 - Git: Version control system for tracking changes in the project.
 - GitHub: Hosting platform for version control and collaboration.
 - PostgreSQL: Open-source relational database management system
-- pgadmin4: Administration and development platform for PostgreSQL
+- pgAdmin4: Administration and development platform for PostgreSQL
 - Postgres.app: PostgreSQL installation packaged as a standard Mac app
 - Amazon Web Services: cloud computing services
 - AiCore: Educational programme for tasks and milestones used for development progression

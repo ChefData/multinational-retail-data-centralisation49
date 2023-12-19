@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import urllib.parse
 import yaml
 
+
 # Define a class for handling database connections and operations
 class DatabaseConnector:
     """

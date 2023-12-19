@@ -1,6 +1,7 @@
-from data_cleaning import DataCleaning
-from data_extraction import DataExtractor
-from database_utils import DatabaseConnector
+from classes.data_cleaning import DataCleaning
+from classes.data_extraction import DataExtractor
+from classes.database_utils import DatabaseConnector
+
 
 if __name__ == "__main__":
     # Creating Class instances
