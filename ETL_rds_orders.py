@@ -38,15 +38,25 @@ if __name__ == "__main__":
     pg_connector.upload_to_db(cleaned_orders_data, table_name_to_upload)
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.")
 
-    # Cast data types
+    # Cast data types - The ? in VARCHAR will be replaced with an integer representing the maximum length of the values in that column.
     column_types = {
-        'date_uuid': 'UUID',
-        'user_uuid': 'UUID',
-        'card_number': 'VARCHAR',
-        'store_code': 'VARCHAR',
-        'product_code': 'VARCHAR',
+        'date_uuid'       : 'UUID',
+        'user_uuid'       : 'UUID',
+        'card_number'     : 'VARCHAR(?)',
+        'store_code'      : 'VARCHAR(?)',
+        'product_code'    : 'VARCHAR(?)',
         'product_quantity': 'SMALLINT',
     }
     pg_connector.cast_data_types(table_name_to_upload, column_types)
     print(f"Columns in '{table_name_to_upload}' table have been cast to the following data types: '{column_types}'")
 
+    # Create foreign key constraints that reference the primary keys of the other table.
+    foreign_keys = {
+        'dim_date_times'   : 'date_uuid',
+        'dim_users'        : 'user_uuid',
+        'dim_card_details' : 'card_number',
+        'dim_store_details': 'store_code',
+        'dim_products'     : 'product_code',
+    }
+    pg_connector.add_foreign_key(table_name_to_upload, foreign_keys)
+    print(f"Columns in '{table_name_to_upload}' table have been with the following foreign key constraints: '{foreign_keys}'")
