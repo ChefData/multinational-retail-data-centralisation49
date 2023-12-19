@@ -37,3 +37,16 @@ if __name__ == "__main__":
     table_name_to_upload = 'orders_table'
     pg_connector.upload_to_db(cleaned_orders_data, table_name_to_upload)
     print(f"Data uploaded to the '{table_name_to_upload}' table in the 'sales_data' PostgreSQL database.")
+
+    # Cast data types
+    column_types = {
+        'date_uuid': 'UUID',
+        'user_uuid': 'UUID',
+        'card_number': 'VARCHAR',
+        'store_code': 'VARCHAR',
+        'product_code': 'VARCHAR',
+        'product_quantity': 'SMALLINT',
+    }
+    pg_connector.cast_data_types(table_name_to_upload, column_types)
+    print(f"Columns in '{table_name_to_upload}' table have been cast to the following data types: '{column_types}'")
+
