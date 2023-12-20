@@ -14,31 +14,51 @@
 - [License information](#license-information)
 
 ## Description of the project
-A multinational company sells various goods across the globe. Currently, their sales data is spread across many different data sources, making it not easily accessible or analysable by current team members. To become more data-driven, the organisation would like to make its sales data accessible from one centralised location.
+A multinational company sells various goods across the globe. Their sales data is spread across many different data sources, making it inaccessible for analysis by current team members. To become more data-driven, the organisation would like to make its sales data accessible from one centralised location.
     1. The first goal is to produce a system that stores the current company data in a database so that it's accessed from one centralised location and acts as a single source of truth for sales data.
     2. The second goal is to query the database to get up-to-date metrics for the business.
 
 This project includes a set of Python scripts and classes for processing and cleaning various types of data, including user data, card data, store data, product data, order data, and date data. Each data type has a corresponding class in the codebase, and static methods within these classes handle specific cleaning and preprocessing tasks.
 
 Data has been stored in different sources, including:
-    - The historical data of users is currently stored in an AWS RDS database in the cloud.
+    - The users' historical data is stored in an AWS RDS database in the cloud.
     - The users' card details are stored in a PDF document in an AWS S3 bucket.
     - The store data can be retrieved through the use of an API.
     - The information for each product the company sells is stored in CSV format in an S3 bucket on AWS.
     - This table, which acts as the single source of truth for all orders the company has made in the past, is stored in a database on AWS RDS.
-    - The final source of data is a JSON file containing the details of when each sale happened and related attributes.
+    - The final data source is a JSON file containing the details of when each sale happened and related attributes.
 
 ### What the project does
 A certificate is issued for demonstrating proficiency in techniques related to data handling, including SQL, database management, data manipulation, and data retrieval using APIs.
 
 ### Aim of the project
-This project aims to test my knowledge of Python programming language, git and GitHub, and the command interface. 
+This project aims to test my knowledge of the Python programming language, the SQL programming language, git and GitHub, the command interface, cloud computing, and web APIs. 
 The project is designed to challenge me to refactor and optimise the code while documenting my experience.
 
 ### Lessons learned
+The following is a condensed list of some of the things I put into practice after learning them through the AiCore Bootcamp:
+
+#### General
+- Created classes to encapsulate the code
+- Defined functions to abstract code
+- Set up conda environments to isolate the project dependencies
+- Created try except blocks for error handling
+- Used descriptive names for methods and variables to enhance code readability.
+- Eliminated code duplication by identifying and refactoring repeated code blocks into separate methods or functions.
+- Ensured that each method has a single responsibility, focusing on a specific task, based on the Single Responsibility Principle (SRP).
+- Wrote access modifiers by making methods private or protected when intended for internal use within the class and not externally accessible.
+- Used the if __name__ == "__main__" statement to include code blocks that should only run when the script was executed directly, not when imported as a module.
+- Wrote with a consistent import order by organising the import statements in a consistent manner: alphabetically, with from statements before import statements to maintain readability.
+- Minimised nested loops to improve code efficiency and reduce complexity.
+- Imported only the specific methods or classes needed from a module to enhance code clarity and prevent naming conflicts.
+- Wrote consistent Docstrings for all methods, explaining their purpose, parameters, return values, and errors raised.
+- Added type annotations to method signatures to improve code maintainability and catch type-related errors during development
+- Used comprehensions to provide a concise and elegant way to create new sequences, such as lists, sets, and dictionaries, by iterating over existing ones
+- Used staticmethods to unbound methods from the class
 
 #### Data Extraction
 - Set up and connected to a database engine
+- Used context managers to manage resources properly
 - Read SQL tables from AWS Relational Database Service
 - Read a PDF from a link and stitched the data together into a DataFrame
 - Sent a GET request to the API endpoint 
@@ -53,7 +73,7 @@ The project is designed to challenge me to refactor and optimise the code while 
 - Checked phone numbers against regular expressions
 - Split strings into multiple parts
 - Converted data types
-- Rearrange the columns in a DataFrame
+- Rearranged the columns in a DataFrame
 - Used for loops to iterate over a DataFrame with a dictionary
 - Reset the index of a DataFrame
 
@@ -63,23 +83,11 @@ The project is designed to challenge me to refactor and optimise the code while 
 - Altered data types of SQL tables with psycopg2
 - Set primary and foreign keys of SQL tables with psycopg2
 
-#### General
-- Created classes to encapsulate the code
-- Defined functions to abstract code
-- Set up conda environments to isolate the project dependencies
-- Created try except blocks for error handling
-- Used descriptive names for methods and variables to enhance code readability.
-- Eliminated code duplication; identified repeated code blocks and refactored them into separate methods or functions.
-- Ensured that each method has a single responsibility, focusing on a specific task, based on the Single Responsibility Principle (SRP).
-- Wrote access modifiers; making methods private or protected when intended for internal use within the class and not externally accessible.
-- Used the if __name__ == "__main__" statement to include code blocks that should only run when the script was executed directly, not when imported as a module.
-- Wrote with a consistent import order; organised the import statements in a consistent manner: alphabetically, with from statements before import statements to maintain readability.
-- Minimised nested loops to improve code efficiency and reduce complexity.
-- Imported only the specific methods or classes needed from a module to enhance code clarity and prevent naming conflicts.
-- Wrote consistent Docstrings: Providing clear and consistent docstrings for all methods, explaining their purpose, parameters, return values, and errors raised.
-- Added type annotations to method signatures to improve code maintainability and catch type-related errors during development
-
-- How to create static methods. --Decorators ??????????
+#### Data Querying
+- Used PostgreSQL to query the data to understand the company sales better
+- Used joins to combine data from across tables
+- Used Case statements for "IF this THEN that" scenarios
+- Used Common Table Expressions to cleanup complicated queries
 
 ## Installation instructions
 To use the data processing and cleaning functionality provided by this project, follow these steps:
@@ -139,9 +147,8 @@ Follow these instructions to set up and install the project on your local machin
 
 > [!NOTE]
 > Make sure you have the following installed:
->   - Python (version 3.11)
+>   - A Code editor such as Visual Studio Code
 >   - Conda (optional but recommended)
->   - PostgreSQL
 >   - pgAdmin4
 
 1. Initialise a new database locally within pgAdmin4 to store the extracted data. 
@@ -150,7 +157,7 @@ Follow these instructions to set up and install the project on your local machin
 
 2. Create a folder within the project directory called do_not_track
 
-3. Within the folder do_not_track, create a file called pg_creds.yaml containing the local database credentials. They are as follows:
+3. Within the folder do_not_track, create a file called pg_creds.yaml containing your local database credentials. They are as follows:
     - DRIVER: postgresql
     - HOST: localhost
     - USER: your_username
@@ -192,7 +199,7 @@ activate AiCore-Project-MRDC
 conda activate AiCore-Project-MRDC
 ```
 
-9. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
+7. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
 * Open a terminal or command prompt on your local machine
 * Run the following command to start the AWS CLI configuration process: 
 ```bash
@@ -210,17 +217,29 @@ aws configure
 aws configure list
 ```
 
-This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
+* This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
 
-9. Run the following Python Scripts to download the data and import it into the SQL database:
+8. Run the following Python Scripts to download the data and import it into the SQL database:
 ```bash
 python ETL_rds_user.py
+```
+```bash
 python ETL_s3_date.py
+```
+```bash
 python ETL_s3_products.py
+```
+```bash
 python ETL_pdf_card.py
+```
+```bash
 python ETL_api_store.py
+```
+```bash
 python ETL_rds_orders.py
 ```
+
+9. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
 
 ## Classes and Methods
 
@@ -285,18 +304,16 @@ multinational-retail-data-centralisation49/
 │ ├── database_utils.py
 │ ├── data_extraction.py
 │ └── data_cleaning.py
-├── scripts/
-│ ├── ETL_rds_user.py
-│ ├── ETL_rds_orders.py
-│ ├── ETL_s3_date.py
-│ ├── ETL_s3_products.py
-│ ├── ETL_pdf_card.py
-│ └── ETL_api_store.py
 ├── do_not_track/ 
 │ ├── pg_creds.yaml
 │ └── db_creds.yaml
-├── docs/
-│ └── AiCore-Project-MRDC-env.yaml
+├── ETL_rds_user.py
+├── ETL_rds_orders.py
+├── ETL_s3_date.py
+├── ETL_s3_products.py
+├── ETL_pdf_card.py
+├── ETL_api_store.py
+├── AiCore-Project-MRDC-env.yaml
 ├── .gitignore
 └── README.md
 
