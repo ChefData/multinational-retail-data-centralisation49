@@ -82,6 +82,7 @@ The following is a condensed list of some of the things I put into practice afte
 - Queried SQL tables with psycopg2
 - Altered data types of SQL tables with psycopg2
 - Set primary and foreign keys of SQL tables with psycopg2
+- Developed a star-based schema of the database, ensuring that the columns are of the correct data types.
 
 #### Data Querying
 - Used PostgreSQL to query the data to understand the company sales better
