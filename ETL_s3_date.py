@@ -1,16 +1,17 @@
 from classes.data_cleaning import DataCleaning
 from classes.data_extraction import DataExtractor
 from classes.database_utils import DatabaseConnector
+from decouple import config
 
 
 if __name__ == "__main__":
     # Creating Class instances
     data_cleaner = DataCleaning()
     data_extractor = DataExtractor()
-    pg_connector = DatabaseConnector('do_not_track/pg_creds.yaml')
+    pg_connector = DatabaseConnector(config('local_db_path'))
 
     # Raw Date data
-    s3_address = 's3://data-handling-public/date_details.json'
+    s3_address = config('s3_date_address')
     raw_date_data = data_extractor.extract_from_s3(s3_address)
 
     # Printing the original DataFrame

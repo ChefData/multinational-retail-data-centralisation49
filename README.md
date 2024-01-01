@@ -7,6 +7,9 @@
     - [Lessons learned](#lessons-learned)
 - [Installation instructions](#installation-instructions)
 - [Usage instructions](#usage-instructions)
+    - [Environment Setup](#environment-setup)
+    - [Credential Setup](#credential-setup)
+    - [Project Navigation](#project-navigation)
 - [Classes and Methods](#classes-and-methods)
 - [File structure of the project](#file-structure-of-the-project)
 - [Tools Used](#tools-used)
@@ -93,6 +96,12 @@ The following is a condensed list of some of the things I put into practice afte
 ## Installation instructions
 To use the data processing and cleaning functionality provided by this project, follow these steps:
 
+> [!NOTE]
+> Make sure you have the following installed:
+>   - A Code editor such as Visual Studio Code
+>   - Conda (optional but recommended)
+>   - pgAdmin4
+
 ### 1. Clone the Repository
 Clone the repository to your local machine using the following:
 
@@ -100,147 +109,160 @@ Clone the repository to your local machine using the following:
 1. Install [Git](https://git-scm.com/download/win).
 2. Open the command prompt or Git Bash.
 3. Clone the repository to your local machine:
-```bash
-git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-```
+        ```bash
+        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+        ```
 
 #### macOS
 1. Open the Terminal.
 2. If you don't have git installed, you can install it using [Homebrew](https://brew.sh/):
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install git
-```
+        ```bash
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install git
+        ```
 
 3. Clone the repository to your local machine:
-```bash
-git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-```
+        ```bash
+        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+        ```
 
 #### Linux: Ubuntu or Debian-based systems
 1. Open the terminal.
 2. Install git:
-```bash
-sudo apt-get update
-sudo apt-get install git
-```
+        ```bash
+        sudo apt-get update
+        sudo apt-get install git
+        ```
 
 3. Clone the repository to your local machine:
-```bash
-git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-```
+        ```bash
+        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+        ```
 
 #### Linux: Fedora
 1. Open the terminal.
 2. Install git:
-```bash
-sudo dnf install git
-```
+        ```bash
+        sudo dnf install git
+        ```
 
 3. Clone the repository to your local machine:
-```bash
-git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-```
+        ```bash
+        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+        ```
 
 ## Usage instructions
 
+> [!NOTE]
+> It is assumed that you are a support engineer at AiCore and have the relevent credentials to download the data that has been stored in the different sources
+
 Follow these instructions to set up and install the project on your local machine.
 
-> [!NOTE]
-> Make sure you have the following installed:
->   - A Code editor such as Visual Studio Code
->   - Conda (optional but recommended)
->   - pgAdmin4
+### Environment Setup
+1. Create a Conda Virtual Environment to isolate the project dependencies (Optional but Recommended)
+        ```bash
+        conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3 awscli python-decouple
+        ```
+
+2. Or import the conda environment from the supplied YAML file
+        ```bash
+        conda env create -f AiCore-Project-MRDC-env.yml
+        ```
+
+3. Activate the conda virtual environment:
+    - On Windows:
+            ```bash
+            activate AiCore-Project-MRDC
+            ```
+
+    - On macOS and Linux:
+            ```bash
+            conda activate AiCore-Project-MRDC
+            ```
+
+### Credential Setup
 
 1. Initialise a new database locally within pgAdmin4 to store the extracted data. 
     - Set up the new database and name it sales_data.
     - This database will store all the company information once you extract it from various data sources.
 
-2. Create a folder within the project directory called do_not_track
-
-3. Within the folder do_not_track, create a file called pg_creds.yaml containing your local database credentials. They are as follows:
+2. Create two YAML files, one containing your local database credentials, the other containing the RDS database credentials. The YAML files should be stuctured as follows:
     - DRIVER: postgresql
-    - HOST: localhost
+    - HOST: your_host
     - USER: your_username
     - PASSWORD: your_password
-    - DATABASE: sales_data
+    - DATABASE: your_database
     - PORT: 5432
 
-3. Within the folder do_not_track, create a file called db_creds.yaml containing the database credentials. They are as follows:
-    - DRIVER: postgresql
-    - HOST: ?????????
-    - USER: ?????????
-    - PASSWORD: ?????????
-    - DATABASE: postgres
-    - PORT: 5432
+3. Create a .env text file in your repository’s root directory in the form:
+        ```bash
+        # RDS Datebase
+        rds_db_path = /Users/your_path_to_rds_database.yaml
 
-4. Navigate to the project directory:
-```bash
-cd multinational-retail-data-centralisation49
-```
+        # Local Database
+        local_db_path = /Users/your_path_to_local_database.yaml
 
-5. Create a Conda Virtual Environment to isolate the project dependencies (Optional but Recommended)
-```bash
-conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3 awscli
-```
+        ## API Store Data
+        api_key = 'AiCore_API_key'
+        number_stores_endpoint = 'link_to_AiCore_number_stores_endpoint'
+        store_endpoint_template = 'link_to_AiCore_store_endpoint_template'
 
-Or import the conda environment from the supplied YAML file
-```bash
-conda env create -f AiCore-Project-MRDC-env.yml
-```
+        ## PDF Card Data
+        pdf_path = "link_to_AiCore_card_details.pdf"
 
-6. Activate the conda virtual environment:
-- On Windows:
-```bash
-activate AiCore-Project-MRDC
-```
+        ## S3 Date Data
+        s3_date_address = 'link_to_AiCore_date_details.json'
 
-- On macOS and Linux:
-```bash
-conda activate AiCore-Project-MRDC
-```
+        ## S3 Products Data
+        s3_products_address = 'link_to_AiCore_products.csv'
+        ```
+ 
+### Project Navigation
 
-7. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
-* Open a terminal or command prompt on your local machine
-* Run the following command to start the AWS CLI configuration process: 
-```bash
-aws configure
-```
-    
-* You will be prompted to enter the following information:
-    * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
-    * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
-    * Default region name: Specify the default AWS region you want to use for AWS CLI commands. In our case, we will use eu-west-1, as this region is geographically close to the UK.
-    * Default output format: Choose the default output format for AWS CLI command results. You can enter JSON, text, table, or YAML. The default format is typically JSON, which provides machine-readable output. If you enter nothing (press Enter) it will default to JSON.
-* After entering the required information, press Enter
-* To verify that the configuration was successful, run the following command: 
-```bash
-aws configure list
-```
+1. Navigate to the project directory:
+        ```bash
+        cd multinational-retail-data-centralisation49
+        ```
 
-* This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
+2. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
+    * Open a terminal or command prompt on your local machine
+    * Run the following command to start the AWS CLI configuration process: 
+            ```bash
+            aws configure
+            ```
+    * You will be prompted to enter the following information:
+        * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
+        * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
+        * Default region name: Specify the default AWS region you want to use for AWS CLI commands. In our case, we will use eu-west-1, as this region is geographically close to the UK.
+        * Default output format: Choose the default output format for AWS CLI command results. You can enter JSON, text, table, or YAML. The default format is typically JSON, which provides machine-readable output. If you enter nothing (press Enter) it will default to JSON.
+    * After entering the required information, press Enter
+    * To verify that the configuration was successful, run the following command: 
+            ```bash
+            aws configure list
+            ```
+    * This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
 
-8. Run the following Python Scripts to download the data and import it into the SQL database:
-```bash
-python ETL_rds_user.py
-```
-```bash
-python ETL_s3_date.py
-```
-```bash
-python ETL_s3_products.py
-```
-```bash
-python ETL_pdf_card.py
-```
-```bash
-python ETL_api_store.py
-```
-```bash
-python ETL_rds_orders.py
-```
+3. Run the following Python Scripts to download the data and import it into the SQL database:
+        ```bash
+        python ETL_rds_user.py
+        ```
+        ```bash
+        python ETL_s3_date.py
+        ```
+        ```bash
+        python ETL_s3_products.py
+        ```
+        ```bash
+        python ETL_pdf_card.py
+        ```
+        ```bash
+        python ETL_api_store.py
+        ```
+        ```bash
+        python ETL_rds_orders.py
+        ```
 
-9. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
+4. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
 
 ## Classes and Methods
 
@@ -300,23 +322,24 @@ A class containing static methods for cleaning and preprocessing various types o
 The project is built around three classes and the Python files needed to download the data:
 
 multinational-retail-data-centralisation49/
-├── classes/
-│ ├── __init__.py
-│ ├── database_utils.py
-│ ├── data_extraction.py
-│ └── data_cleaning.py
-├── do_not_track/ 
-│ ├── pg_creds.yaml
-│ └── db_creds.yaml
-├── ETL_rds_user.py
+├── AiCore-Project-MRDC-env.yaml
+├── ETL_api_store.py
+├── ETL_pdf_card.py
 ├── ETL_rds_orders.py
+├── ETL_rds_user.py
 ├── ETL_s3_date.py
 ├── ETL_s3_products.py
-├── ETL_pdf_card.py
-├── ETL_api_store.py
-├── AiCore-Project-MRDC-env.yaml
+├── Milestone_4_Querying_the_data.txt
+├── README.md
+├── classes
+│   ├── __init__.py
+│   ├── data_cleaning.py
+│   ├── data_extraction.py
+│   └── database_utils.py
+├── creds_local.yaml
+├── creds_rds.yaml
 ├── .gitignore
-└── README.md
+└── .env
 
 ## Tools Used
 - Visual Studio Code: Code editor used for development.
@@ -328,6 +351,7 @@ multinational-retail-data-centralisation49/
     - psycopg2: PostgreSQL database adapter for the Python programming language
     - requests: Python HTTP library allows users to send HTTP requests to a specified URL.
     - boto3: Boto3 is an AWS SDK for Python that enables developers to integrate their Python applications, libraries, or scripts with AWS services such as Amazon S3, Amazon EC2, and Amazon DynamoDB
+    - Decouple: helps you to organize your settings so that you can change parameters without having to redeploy your app.
 - Git: Version control system for tracking changes in the project.
 - GitHub: Hosting platform for version control and collaboration.
 - PostgreSQL: Open-source relational database management system

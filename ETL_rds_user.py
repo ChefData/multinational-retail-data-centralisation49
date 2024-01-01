@@ -1,14 +1,15 @@
 from classes.data_cleaning import DataCleaning
 from classes.data_extraction import DataExtractor
 from classes.database_utils import DatabaseConnector
+from decouple import config
 
 
 if __name__ == "__main__":
     # Creating Class instances
     data_cleaner = DataCleaning()
     data_extractor = DataExtractor()
-    db_connector = DatabaseConnector('do_not_track/db_creds.yaml')
-    pg_connector = DatabaseConnector('do_not_track/pg_creds.yaml')
+    db_connector = DatabaseConnector(config('rds_db_path'))
+    pg_connector = DatabaseConnector(config('local_db_path'))
 
     # Listing and printing all tables in the database
     db_tables = db_connector.list_db_tables()

@@ -1,16 +1,17 @@
 from classes.data_cleaning import DataCleaning
 from classes.data_extraction import DataExtractor
 from classes.database_utils import DatabaseConnector
+from decouple import config
 
 
 if __name__ == "__main__":
     # Creating Class instances
     data_cleaner = DataCleaning()
     data_extractor = DataExtractor()
-    pg_connector = DatabaseConnector('do_not_track/pg_creds.yaml')
+    pg_connector = DatabaseConnector(config('local_db_path'))
 
     # Raw Card data
-    pdf_path = "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf"
+    pdf_path = config('pdf_path')
     raw_card_data = data_extractor.retrieve_pdf_data(pdf_path)
 
     # Printing the original DataFrame

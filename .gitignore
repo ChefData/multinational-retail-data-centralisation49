@@ -1,2 +1,10 @@
+# Directories
 do_not_track/
 __pycache__/
+
+# File Extensions
+*.env
+
+# Individual Files
+creds_rds.yaml
+creds_local.yaml
