@@ -8,6 +8,7 @@
 - [Installation instructions](#installation-instructions)
 - [Usage instructions](#usage-instructions)
     - [Environment Setup](#environment-setup)
+    - [AWS Configuration](#aws-configuration)
     - [Credential Setup](#credential-setup)
     - [Project Navigation](#project-navigation)
 - [Classes and Methods](#classes-and-methods)
@@ -161,7 +162,7 @@ git clone https://github.com/ChefData/multinational-retail-data-centralisation49
 ## Usage instructions
 
 > [!NOTE]
-> It is assumed that you are a support engineer at AiCore and have the relevent credentials to download the data that has been stored in the different sources
+> It is assumed that you are a support engineer at AiCore and have the relevant credentials to download the data that has been stored in the different sources
 
 Follow these instructions to set up and install the project on your local machine.
 
@@ -179,17 +180,44 @@ conda env create -f AiCore-Project-MRDC-env.yml
 ```
 
 3. Activate the conda virtual environment:
-    - On Windows:
+- On Windows:
 
 ```bash
 activate AiCore-Project-MRDC
 ```
 
-    - On macOS and Linux:
+- On macOS and Linux:
 
 ```bash
 conda activate AiCore-Project-MRDC
 ```
+
+### AWS Configuration
+
+> [!NOTE]
+> You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
+
+1. Open a terminal or command prompt on your local machine
+2. Run the following command to start the AWS CLI configuration process: 
+
+```bash
+aws configure
+```
+
+3. You will be prompted to enter the following information:
+    * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
+    * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
+    * Default region name: Specify the default AWS region you want to use for AWS CLI commands. In our case, we will use eu-west-1, as this region is geographically close to the UK.
+    * Default output format: Choose the default output format for AWS CLI command results. You can enter JSON, text, table, or YAML. The default format is typically JSON, which provides machine-readable output. If you enter nothing (press Enter) it will default to JSON.
+      
+4. After entering the required information, press Enter
+5. To verify that the configuration was successful, run the following command: 
+
+```bash
+aws configure list
+```
+
+6. This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
 
 ### Credential Setup
 
@@ -218,18 +246,18 @@ conda activate AiCore-Project-MRDC
     local_db_path = /Users/your_path_to_local_database.yaml
 
     ## API Store Data
-    api_key = 'AiCore_API_key'
-    number_stores_endpoint = 'link_to_AiCore_number_stores_endpoint'
-    store_endpoint_template = 'link_to_AiCore_store_endpoint_template'
+    api_key = `AiCore_API_key`
+    number_stores_endpoint = `link_to_AiCore_number_stores_endpoint`
+    store_endpoint_template = `link_to_AiCore_store_endpoint_template`
 
     ## PDF Card Data
-    pdf_path = "link_to_AiCore_card_details.pdf"
+    pdf_path = `link_to_AiCore_card_details.pdf`
 
     ## S3 Date Data
-    s3_date_address = 'link_to_AiCore_date_details.json'
+    s3_date_address = `link_to_AiCore_date_details.json`
 
     ## S3 Products Data
-    s3_products_address = 'link_to_AiCore_products.csv'
+    s3_products_address = `link_to_AiCore_products.csv`
 ```
  
 ### Project Navigation
@@ -240,29 +268,7 @@ conda activate AiCore-Project-MRDC
 cd multinational-retail-data-centralisation49
 ```
 
-2. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
-    * Open a terminal or command prompt on your local machine
-    * Run the following command to start the AWS CLI configuration process: 
-
-```bash
-aws configure
-```
-
-    * You will be prompted to enter the following information:
-        * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
-        * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
-        * Default region name: Specify the default AWS region you want to use for AWS CLI commands. In our case, we will use eu-west-1, as this region is geographically close to the UK.
-        * Default output format: Choose the default output format for AWS CLI command results. You can enter JSON, text, table, or YAML. The default format is typically JSON, which provides machine-readable output. If you enter nothing (press Enter) it will default to JSON.
-    * After entering the required information, press Enter
-    * To verify that the configuration was successful, run the following command: 
-
-```bash
-aws configure list
-```
-
-    * This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
-
-3. Run the following Python Scripts to download the data and import it into the SQL database:
+2. Run the following Python Scripts to download the data and import it into the SQL database:
 
 ```bash
 python ETL_rds_user.py
@@ -283,7 +289,7 @@ python ETL_api_store.py
 python ETL_rds_orders.py
 ```
 
-4. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
+3. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
 
 ## Classes and Methods
 
@@ -342,25 +348,25 @@ A class containing static methods for cleaning and preprocessing various types o
 ## File structure of the project
 The project is built around three classes and the Python files needed to download the data:
 
-multinational-retail-data-centralisation49/
-├── AiCore-Project-MRDC-env.yaml
-├── ETL_api_store.py
-├── ETL_pdf_card.py
-├── ETL_rds_orders.py
-├── ETL_rds_user.py
-├── ETL_s3_date.py
-├── ETL_s3_products.py
-├── Milestone_4_Querying_the_data.txt
-├── README.md
-├── classes
-│   ├── __init__.py
-│   ├── data_cleaning.py
-│   ├── data_extraction.py
-│   └── database_utils.py
-├── creds_local.yaml
-├── creds_rds.yaml
-├── .gitignore
-└── .env
+    .
+    ├── AiCore-Project-MRDC-env.yaml
+    ├── ETL_api_store.py
+    ├── ETL_pdf_card.py
+    ├── ETL_rds_orders.py
+    ├── ETL_rds_user.py
+    ├── ETL_s3_date.py
+    ├── ETL_s3_products.py
+    ├── Milestone_4_Querying_the_data.txt
+    ├── README.md
+    ├── classes
+    │   ├── __init__.py
+    │   ├── data_cleaning.py
+    │   ├── data_extraction.py
+    │   └── database_utils.py
+    ├── creds_local.yaml
+    ├── creds_rds.yaml
+    ├── .gitignore
+    └── .env
 
 ## Tools Used
 - Visual Studio Code: Code editor used for development.
