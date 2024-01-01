@@ -109,47 +109,54 @@ Clone the repository to your local machine using the following:
 1. Install [Git](https://git-scm.com/download/win).
 2. Open the command prompt or Git Bash.
 3. Clone the repository to your local machine:
-        ```bash
-        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-        ```
+
+```bash
+git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+```
 
 #### macOS
 1. Open the Terminal.
 2. If you don't have git installed, you can install it using [Homebrew](https://brew.sh/):
-        ```bash
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        brew install git
-        ```
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install git
+```
 
 3. Clone the repository to your local machine:
-        ```bash
-        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-        ```
+
+```bash
+git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+```
 
 #### Linux: Ubuntu or Debian-based systems
 1. Open the terminal.
 2. Install git:
-        ```bash
-        sudo apt-get update
-        sudo apt-get install git
-        ```
+
+```bash
+sudo apt-get update
+sudo apt-get install git
+```
 
 3. Clone the repository to your local machine:
-        ```bash
-        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-        ```
+
+```bash
+git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+```
 
 #### Linux: Fedora
 1. Open the terminal.
 2. Install git:
-        ```bash
-        sudo dnf install git
-        ```
+
+```bash
+sudo dnf install git
+```
 
 3. Clone the repository to your local machine:
-        ```bash
-        git clone https://github.com/ChefData/multinational-retail-data-centralisation49
-        ```
+
+```bash
+git clone https://github.com/ChefData/multinational-retail-data-centralisation49
+```
 
 ## Usage instructions
 
@@ -160,25 +167,29 @@ Follow these instructions to set up and install the project on your local machin
 
 ### Environment Setup
 1. Create a Conda Virtual Environment to isolate the project dependencies (Optional but Recommended)
-        ```bash
-        conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3 awscli python-decouple
-        ```
+
+```bash
+conda create -n AiCore-Project-MRDC python=3.11 ipykernel pandas PyYAML sqlalchemy postgresql tabula-py psycopg2 requests boto3 awscli python-decouple
+```
 
 2. Or import the conda environment from the supplied YAML file
-        ```bash
-        conda env create -f AiCore-Project-MRDC-env.yml
-        ```
+
+```bash
+conda env create -f AiCore-Project-MRDC-env.yml
+```
 
 3. Activate the conda virtual environment:
     - On Windows:
-            ```bash
-            activate AiCore-Project-MRDC
-            ```
+
+```bash
+activate AiCore-Project-MRDC
+```
 
     - On macOS and Linux:
-            ```bash
-            conda activate AiCore-Project-MRDC
-            ```
+
+```bash
+conda activate AiCore-Project-MRDC
+```
 
 ### Credential Setup
 
@@ -187,49 +198,56 @@ Follow these instructions to set up and install the project on your local machin
     - This database will store all the company information once you extract it from various data sources.
 
 2. Create two YAML files, one containing your local database credentials, the other containing the RDS database credentials. The YAML files should be stuctured as follows:
-    - DRIVER: postgresql
-    - HOST: your_host
-    - USER: your_username
-    - PASSWORD: your_password
-    - DATABASE: your_database
-    - PORT: 5432
+
+```yaml
+    DRIVER: postgresql
+    HOST: your_host
+    USER: your_username
+    PASSWORD: your_password
+    DATABASE: your_database
+    PORT: 5432
+```
 
 3. Create a .env text file in your repository’s root directory in the form:
-        ```bash
-        # RDS Datebase
-        rds_db_path = /Users/your_path_to_rds_database.yaml
 
-        # Local Database
-        local_db_path = /Users/your_path_to_local_database.yaml
+```env
+    # RDS Datebase
+    rds_db_path = /Users/your_path_to_rds_database.yaml
 
-        ## API Store Data
-        api_key = 'AiCore_API_key'
-        number_stores_endpoint = 'link_to_AiCore_number_stores_endpoint'
-        store_endpoint_template = 'link_to_AiCore_store_endpoint_template'
+    # Local Database
+    local_db_path = /Users/your_path_to_local_database.yaml
 
-        ## PDF Card Data
-        pdf_path = "link_to_AiCore_card_details.pdf"
+    ## API Store Data
+    api_key = 'AiCore_API_key'
+    number_stores_endpoint = 'link_to_AiCore_number_stores_endpoint'
+    store_endpoint_template = 'link_to_AiCore_store_endpoint_template'
 
-        ## S3 Date Data
-        s3_date_address = 'link_to_AiCore_date_details.json'
+    ## PDF Card Data
+    pdf_path = "link_to_AiCore_card_details.pdf"
 
-        ## S3 Products Data
-        s3_products_address = 'link_to_AiCore_products.csv'
-        ```
+    ## S3 Date Data
+    s3_date_address = 'link_to_AiCore_date_details.json'
+
+    ## S3 Products Data
+    s3_products_address = 'link_to_AiCore_products.csv'
+```
  
 ### Project Navigation
 
 1. Navigate to the project directory:
-        ```bash
-        cd multinational-retail-data-centralisation49
-        ```
+
+```bash
+cd multinational-retail-data-centralisation49
+```
 
 2. You must be logged into the AWS CLI before retrieving the data from the S3 bucket.
     * Open a terminal or command prompt on your local machine
     * Run the following command to start the AWS CLI configuration process: 
-            ```bash
-            aws configure
-            ```
+
+```bash
+aws configure
+```
+
     * You will be prompted to enter the following information:
         * AWS Access Key ID: Enter the access key ID you obtained during the access key generation process
         * AWS Secret Access Key: Enter the secret access key corresponding to the access key ID you provided
@@ -237,30 +255,33 @@ Follow these instructions to set up and install the project on your local machin
         * Default output format: Choose the default output format for AWS CLI command results. You can enter JSON, text, table, or YAML. The default format is typically JSON, which provides machine-readable output. If you enter nothing (press Enter) it will default to JSON.
     * After entering the required information, press Enter
     * To verify that the configuration was successful, run the following command: 
-            ```bash
-            aws configure list
-            ```
+
+```bash
+aws configure list
+```
+
     * This command will display the configuration settings, including the access key ID, secret access key (partially masked), default region, and default output format. Make sure the displayed values match the credentials you provided during the configuration.
 
 3. Run the following Python Scripts to download the data and import it into the SQL database:
-        ```bash
-        python ETL_rds_user.py
-        ```
-        ```bash
-        python ETL_s3_date.py
-        ```
-        ```bash
-        python ETL_s3_products.py
-        ```
-        ```bash
-        python ETL_pdf_card.py
-        ```
-        ```bash
-        python ETL_api_store.py
-        ```
-        ```bash
-        python ETL_rds_orders.py
-        ```
+
+```bash
+python ETL_rds_user.py
+```
+```bash
+python ETL_s3_date.py
+```
+```bash
+python ETL_s3_products.py
+```
+```bash
+python ETL_pdf_card.py
+```
+```bash
+python ETL_api_store.py
+```
+```bash
+python ETL_rds_orders.py
+```
 
 4. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
 
