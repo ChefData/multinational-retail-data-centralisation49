@@ -1,9 +1,7 @@
 # Import necessary modules from psycopg2, SQLAlchemy, urllib, and PyYAML for database operations
 from sqlalchemy import create_engine, inspect, URL
 from sqlalchemy.exc import SQLAlchemyError
-import psycopg2
-import urllib.parse
-import yaml
+import urllib.parse, yaml
 
 
 # Define a class for handling database connections and operations
@@ -14,43 +12,6 @@ class DatabaseConnector:
     interacting with a PostgreSQL database, providing methods for
     creating connection URLs, casting data types, adding primary keys, and
     adding foreign keys to tables.
-
-    Attributes:
-    - db_creds_file (str): Path to the YAML file containing database credentials.
-    - db_engine (sqlalchemy.engine.Engine): SQLAlchemy engine for database operations.
-
-    Private Methods:
-    - __init__(self, db_creds_file: str) -> None:
-        Initialises a DatabaseConnector object.
-
-    - __read_db_creds(self) -> dict:
-        Reads and returns the database credentials from the specified YAML file.
-
-    - __create_db_url(self) -> URL:
-        Creates a SQLAlchemy database URL based on the provided database credentials.
-
-    - __create_psycopg2_url(self) -> str:
-        Creates a PostgreSQL connection URL based on the provided database credentials.
-
-    Protected Methods:
-    - _init_db_engine(self) -> create_engine:
-        Initialises and returns a SQLAlchemy engine using the database URL.
-    
-    Public Methods:
-    - list_db_tables(self) -> list:
-        Lists the names of tables in the connected database.
-
-    - upload_to_db(self, df: pd.DataFrame, table_name: str) -> None:
-        Uploads a Pandas DataFrame to the specified table in the connected database.
-
-    - cast_data_types(self, table_name, column_types) -> None:
-        Casts the data types of columns in a PostgreSQL table based on the provided dictionary of column types.
-
-    - add_primary_key(self, table_name, primary_key) -> None:
-        Adds a primary key constraint to a PostgreSQL table.
-
-    - add_foreign_key(self, table_name, foreign_keys) -> None:
-        Adds foreign key constraints to a PostgreSQL table based on the provided dictionary of foreign keys.
     """
 
     def __init__(self, db_creds_file: str) -> None:
@@ -59,12 +20,15 @@ class DatabaseConnector:
 
         Parameters:
         - db_creds_file (str): Path to the YAML file containing database credentials.
+        
+        Attributes:
+        - db_engine (sqlalchemy.engine.Engine): SQLAlchemy engine for database operations.
         """
         # Constructor that takes the path to a YAML file containing database credentials
         self.db_creds_file = db_creds_file
         # Initialise the database engine upon instantiation
         self.db_engine = self._init_db_engine()
-    
+
     def __read_db_creds(self) -> dict:
         """
         Reads and returns the database credentials from the specified YAML file.
@@ -87,7 +51,7 @@ class DatabaseConnector:
         except yaml.YAMLError as error:
             raise yaml.YAMLError(f"Error: Unable to load YAML from '{self.db_creds_file}': {error}")
 
-    def __create_db_url(self) -> URL:
+    def _create_db_url(self) -> URL:
         """
         Creates a SQLAlchemy database URL based on the provided database credentials.
 
@@ -130,7 +94,7 @@ class DatabaseConnector:
         """
         try:
             # Create a database URL
-            db_url = self.__create_db_url()
+            db_url = self._create_db_url()
             # Initialise the database engine
             engine = create_engine(db_url)
             return engine
@@ -158,139 +122,3 @@ class DatabaseConnector:
         # Handle any errors that may occur during table listing
         except SQLAlchemyError as error:
             raise SQLAlchemyError(f"Error listing database tables: {error}")
-
-    def upload_to_db(self, df, table_name) -> None:
-        """
-        Uploads a Pandas DataFrame to the specified table in the connected database.
-
-        Parameters:
-        - df (pd.DataFrame): DataFrame to be uploaded.
-        - table_name (str): Name of the table in the database.
-
-        Raises:
-        - SQLAlchemyError: If there is an error uploading the DataFrame to the database.
-        """
-        try:
-            # Establish a connection to the database engine
-            with self.db_engine.connect() as connection:
-                # Use the to_sql method to upload the DataFrame to the specified table
-                df.to_sql(table_name, connection, if_exists='replace', index=False)
-        # Handle any errors that may occur during DataFrame upload
-        except SQLAlchemyError as error:
-            raise SQLAlchemyError(f"Error uploading DataFrame to database: {error}")
-
-    def __create_psycopg2_url(self) -> str:
-        """
-        Creates a PostgreSQL connection URL based on the provided database credentials.
-
-        Returns:
-        - str: PostgreSQL connection URL.
-
-        Raises:
-        - ValueError: If required database credentials are missing or incomplete.
-        """
-        try:
-            # Read database credentials from the YAML file
-            db_creds = self.__read_db_creds()
-            # Check if all required keys are present in the credentials
-            required_keys = ['USER', 'PASSWORD', 'HOST', 'PORT', 'DATABASE']
-            if any(key not in db_creds for key in required_keys):
-                raise ValueError("Error: Database credentials are missing or incomplete.")
-            # Create a connection string
-            conn_string = (
-                f"user={db_creds['USER']} "
-                f"password={urllib.parse.quote_plus(db_creds['PASSWORD'])} "
-                f"host={db_creds['HOST']} "
-                f"port={db_creds['PORT']} "
-                f"dbname={db_creds['DATABASE']}"
-            )
-            return conn_string
-        except ValueError as error:
-            raise ValueError(f"Error creating database connection string: {error}")
-
-    def cast_data_types(self, table_name, column_types) -> None:
-        """
-        Casts the data types of columns in a PostgreSQL table based on the provided dictionary of column types.
-
-        Parameters:
-        - table_name (str): The name of the PostgreSQL table.
-        - column_types (dict): A dictionary where keys are column names and values are the desired data types.
-        """
-        db_url = self.__create_psycopg2_url()
-        # Initialize max_lengths dictionary
-        max_lengths = {}
-        # Connect to the PostgreSQL database
-        with psycopg2.connect(db_url) as conn:
-            with conn.cursor() as cur:
-                for column_name, data_type in column_types.items():
-                    if data_type == 'VARCHAR(?)':
-                        # Construct the query to find the maximum length
-                        query = f"SELECT MAX(CHAR_LENGTH(CAST({column_name} AS VARCHAR))) FROM {table_name};"
-                        # Execute the query
-                        cur.execute(query)
-                        # Fetch the result
-                        max_length = cur.fetchone()[0]
-                        # Update max_lengths dictionary
-                        max_lengths[column_name] = max_length
-                        # Construct the ALTER TABLE query
-                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE VARCHAR({max_length});"
-                    else:
-                        alter_query = f"ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE {data_type} USING {column_name}::{data_type};"
-                    try:
-                        # Execute the ALTER TABLE query
-                        cur.execute(alter_query)
-                    except psycopg2.Error as error:
-                        conn.rollback()
-                        print(f"Error updating column {column_name} in {table_name}: {error}")
-        # Commit the connection
-        conn.commit()
-
-    def add_primary_key(self, table_name, primary_key) -> None:
-        """
-        Adds a primary key constraint to a PostgreSQL table.
-
-        Parameters:
-        - table_name (str): The name of the PostgreSQL table.
-        - primary_key (str): The column name or a comma-separated list of column names for the primary key.
-
-        Returns:
-        None
-        """
-        db_url = self.__create_psycopg2_url()
-        # Connect to the PostgreSQL database
-        with psycopg2.connect(db_url) as conn:
-            with conn.cursor() as cur:
-                # Construct the query
-                alter_query = f"ALTER TABLE {table_name} ADD PRIMARY KEY ({primary_key});"
-                try:
-                    # Execute the ALTER TABLE query
-                    cur.execute(alter_query)
-                except psycopg2.Error as error:
-                    conn.rollback()
-                    print(f"Error adding primary key to {table_name}: {error}")
-        # Commit the connection
-        conn.commit()
-
-    def add_foreign_key(self, table_name, foreign_keys) -> None:
-        """
-        Adds foreign key constraints to a PostgreSQL table based on the provided dictionary of foreign keys.
-
-        Parameters:
-        - table_name (str): The name of the PostgreSQL table.
-        - foreign_keys (dict): A dictionary where keys are reference table names and values are foreign key column names.
-        """
-        db_url = self.__create_psycopg2_url()
-        # Connect to the PostgreSQL database
-        with psycopg2.connect(db_url) as conn:
-            with conn.cursor() as cur:
-                for reference_table, foreign_key in foreign_keys.items():
-                    # Construct the query to find the maximum length
-                    alter_query = f"ALTER TABLE {table_name} ADD FOREIGN KEY ({foreign_key}) REFERENCES {reference_table}({foreign_key});"
-                    try:
-                        # Execute the ALTER TABLE query
-                        cur.execute(alter_query)
-                    except psycopg2.Error as error:
-                        conn.rollback()
-                        print(f"Error adding foreign key to {table_name}: {error}")
-        # Commit the connection
-        conn.commit()
