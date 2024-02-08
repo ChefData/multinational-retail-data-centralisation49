@@ -4,6 +4,7 @@ __pycache__/
 
 # File Extensions
 *.env
+*.DS_Store
 
 # Individual Files
 creds_rds.yaml
