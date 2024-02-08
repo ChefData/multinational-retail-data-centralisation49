@@ -13,7 +13,7 @@ class DataCleaning:
     - clean_card_data(card_data_df: pd.DataFrame) -> pd.DataFrame:
         Clean and preprocess card data DataFrame.
 
-    - called_clean_store_data(store_data_df: pd.DataFrame) -> pd.DataFrame:
+    - clean_store_data(store_data_df: pd.DataFrame) -> pd.DataFrame:
         Clean and preprocess store data DataFrame.
 
     - convert_product_weights(product_data_df: pd.DataFrame) -> pd.DataFrame:
@@ -134,7 +134,7 @@ class DataCleaning:
         return card_data_df
     
     @staticmethod    
-    def called_clean_store_data(store_data_df) -> pd.DataFrame:
+    def clean_store_data(store_data_df) -> pd.DataFrame:
         """
         Clean and preprocess store data DataFrame.
 
@@ -196,7 +196,7 @@ class DataCleaning:
         return store_data_df
     
     @staticmethod    
-    def convert_product_weights(product_data_df) -> pd.DataFrame:
+    def __convert_product_weights(product_data_df) -> pd.DataFrame:
         """
         Convert product weights to a standardised unit (kilograms).
 
@@ -240,6 +240,9 @@ class DataCleaning:
         Returns:
         - pd.DataFrame: Cleaned product data DataFrame.
         """
+        # Convert product weights to a standardised unit (kilograms)
+        product_data_df = DataCleaning.__convert_product_weights(product_data_df)
+
         # Reset index
         product_data_df = product_data_df.set_index('Unnamed: 0')
 
