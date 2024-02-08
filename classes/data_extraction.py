@@ -1,49 +1,23 @@
 # Import necessary modules for handling AWS services, PDF extraction, data manipulation, and HTTP requests
 from botocore.exceptions import NoCredentialsError, ClientError
-import boto3
-import json
-import pandas as pd
-import requests
-import tabula
+from decouple import config
+import boto3, json, pandas as pd, requests, tabula
 
 
 class DataExtractor:
     """
     A class for extracting data from various sources such as databases, PDFs, APIs, and S3.
-
-    Attributes:
-    - header (dict): API key header.
-
-    Private Methods:
-    - __init__(self) -> None:
-        Initialises a DataExtractor object.
-    
-    Public Methods:
-    - read_rds_table(self, db_connector, table_name: str) -> pd.DataFrame:
-        Reads a table from a relational database and returns the data as a Pandas DataFrame.
-
-    - retrieve_pdf_data(self, pdf_link) -> pd.DataFrame:
-        Retrieves data from a PDF link and returns it as a Pandas DataFrame.
-
-    - set_api_key(self, api_key) -> None:
-        Sets the API key header.
-
-    - list_number_of_stores(self, number_stores_endpoint) -> int:
-        Retrieves the number of stores from an API endpoint.
-
-    - retrieve_stores_data(self, store_endpoint, number_of_stores) -> pd.DataFrame:
-        Retrieves store data from an API endpoint for a given number of stores and returns it as a Pandas DataFrame.
-
-    - extract_from_s3(self, s3_address) -> pd.DataFrame:
-        Extracts data from an S3 bucket based on the provided S3 address and returns it as a Pandas DataFrame.
     """
 
     def __init__(self):
         """
         Initialises a DataExtractor object.
+        
+        Attributes:
+        - header (dict): API key header.
         """
         # Constructor to initialise the API key header
-        self.header = None
+        self.header = {'x-api-key': config('api_key')}
 
     @staticmethod
     def read_rds_table(db_connector, table_name: str) -> pd.DataFrame:
@@ -106,16 +80,6 @@ class DataExtractor:
             raise FileNotFoundError(f"The PDF file was not found @ link: '{pdf_link}'")
         except RuntimeError as error:
             raise RuntimeError(f"An error occurred while processing the PDF: {error}")
-
-    def set_api_key(self, api_key) -> None:
-        """
-        Sets the API key header.
-
-        Parameters:
-        - api_key (str): API key.
-        """
-        # Method to set the API key for making authenticated requests to an API
-        self.header = {'x-api-key': api_key}
 
     def list_number_of_stores(self, number_stores_endpoint):
         """
