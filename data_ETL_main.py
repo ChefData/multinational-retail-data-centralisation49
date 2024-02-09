@@ -31,11 +31,11 @@ if __name__ == "__main__":
     print("Raw data cleaned")
 
     # Load clean data into PostgreSQL tables
-    data_loader.upload_and_configure_table(cleaned_orders_data,   'orders_table2',      data_loader.orders_column_types(),   primary_key=None,           foreign_keys=data_loader.orders_foreign_keys())
-    data_loader.upload_and_configure_table(cleaned_user_data,     'dim_users2',         data_loader.user_column_types(),     primary_key='user_uuid',    foreign_keys=None)
-    data_loader.upload_and_configure_table(cleaned_date_data,     'dim_date_times2',    data_loader.date_column_types(),     primary_key='date_uuid',    foreign_keys=None)
-    data_loader.upload_and_configure_table(cleaned_products_data, 'dim_products2',      data_loader.products_column_types(), primary_key='product_code', foreign_keys=None)
-    data_loader.upload_and_configure_table(cleaned_store_data,    'dim_store_details2', data_loader.store_column_types(),    primary_key='store_code',   foreign_keys=None)
-    data_loader.upload_and_configure_table(cleaned_card_data,     'dim_card_details2',  data_loader.card_column_types(),     primary_key='card_number',  foreign_keys=None)
+    data_loader.upload_and_configure_table(cleaned_orders_data,   'orders_table',      data_loader.orders_column_types(),   primary_key=None,           foreign_keys=data_loader.orders_foreign_keys())
+    data_loader.upload_and_configure_table(cleaned_user_data,     'dim_users',         data_loader.user_column_types(),     primary_key='user_uuid',    foreign_keys=None)
+    data_loader.upload_and_configure_table(cleaned_date_data,     'dim_date_times',    data_loader.date_column_types(),     primary_key='date_uuid',    foreign_keys=None)
+    data_loader.upload_and_configure_table(cleaned_products_data, 'dim_products',      data_loader.products_column_types(), primary_key='product_code', foreign_keys=None)
+    data_loader.upload_and_configure_table(cleaned_store_data,    'dim_store_details', data_loader.store_column_types(),    primary_key='store_code',   foreign_keys=None)
+    data_loader.upload_and_configure_table(cleaned_card_data,     'dim_card_details',  data_loader.card_column_types(),     primary_key='card_number',  foreign_keys=None)
     print("Cleaned data loaded to PostgreSQL tables")
 
