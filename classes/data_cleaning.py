@@ -5,28 +5,6 @@ import pandas as pd
 class DataCleaning:
     """
     A class containing static methods for cleaning and preprocessing various types of data.
-
-    Public Methods:
-    - clean_user_data(user_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess user data DataFrame.
-
-    - clean_card_data(card_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess card data DataFrame.
-
-    - clean_store_data(store_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess store data DataFrame.
-
-    - convert_product_weights(product_data_df: pd.DataFrame) -> pd.DataFrame:
-        Convert product weights to a standardised unit (kilograms).
-
-    - clean_products_data(product_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess product data DataFrame.
-
-    - clean_orders_data(orders_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess orders data DataFrame.
-
-    - clean_date_data(date_data_df: pd.DataFrame) -> pd.DataFrame:
-        Clean and preprocess date data DataFrame.
     """
 
     @staticmethod
