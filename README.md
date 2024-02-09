@@ -392,7 +392,7 @@ The project is built around three classes and the Python files needed to downloa
 .
 ├── AiCore-Project-MRDC-env.yaml
 ├── data_ETL_main.py
-├── Milestone_4_Querying_the_data.txt
+├── data_query.ipynb
 ├── README.md
 ├── __pycache__
 ├── classes
