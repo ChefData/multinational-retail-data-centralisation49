@@ -298,7 +298,11 @@ Follow these instructions to set up and install the project on your local machin
     python data_ETL_main.py
     ```
 
-3. The text file Milestone_4_Querying_the_data.txt has been supplied to show examples of data querying tasks done through pgAdmin4 with the downloaded data.
+3. Run the following notebook to query the data:
+
+    ```bash
+    python data_query.ipynb
+    ```
 
 ## Classes and Methods
 
