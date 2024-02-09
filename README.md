@@ -11,6 +11,7 @@
   - [Environment Setup](#environment-setup)
   - [AWS Configuration](#aws-configuration)
   - [Credential Setup](#credential-setup)
+  - [Connect to local database](#connect-to-local-database)
   - [Project Navigation](#project-navigation)
 - [Classes and Methods](#classes-and-methods)
   - [DatabaseConnector](#databaseconnector)
@@ -28,25 +29,36 @@ A multinational company sells various goods across the globe. Their sales data i
 1. The first goal is to produce a system that stores the current company data in a database so that it's accessed from one centralised location and acts as a single source of truth for sales data.
 2. The second goal is to query the database to get up-to-date metrics for the business.
 
-This project includes a set of Python scripts and classes for processing and cleaning various types of data, including user data, card data, store data, product data, order data, and date data. Each data type has a corresponding class in the codebase, and static methods within these classes handle specific cleaning and preprocessing tasks.
+This project includes a set of Python scripts and classes for processing and cleaning various types of data.
 
-Data has been stored in different sources, including:
+Data has been stored in five different sources, including:
 
 - The users' historical data is stored in an AWS RDS database in the cloud.
 - The users' card details are stored in a PDF document in an AWS S3 bucket.
 - The store data can be retrieved through the use of an API.
 - The information for each product the company sells is stored in CSV format in an S3 bucket on AWS.
 - This table, which acts as the single source of truth for all orders the company has made in the past, is stored in a database on AWS RDS.
-- The final data source is a JSON file containing the details of when each sale happened and related attributes.
+- The final data source is a series of JSON objects containing the details of when each sale happened and related attributes.
 
 ### What the project does
 
-A certificate is issued for demonstrating proficiency in techniques related to data handling, including SQL, database management, data manipulation, and data retrieval using APIs.
+In this project, the following actions will take place:
+
+1. How to connect and extract data from multiple sources e.g. a csv file, a PDF, an S3 Bucket, an API, and a json file.
+2. How to clean data effectively by considering NULL values, duplicates, valid data types, incorrectly typed values, wrong information, and formatting.
+3. How to organise code effectively into suitable classes to connect, extract, and clean data.
+4. How to query the data using pgAdmin 4 to cast data types, manipulate the tables, and set primary and foreign keys.
+5. How to query the data using pgAdmin 4 to generate insights such as:
+   - Which locations have the most stores?
+   - Which month produced the largest number of sales?
+   - How many sales are coming from online?
+   - What percentage of sales come through each type of store?
 
 ### Aim of the project
 
-This project aims to test my knowledge of the Python programming language, the SQL programming language, git and GitHub, the command interface, cloud computing, and web APIs.
-The project is designed to challenge me to refactor and optimise the code while documenting my experience.
+This project has been designed to demonstrate proficiency in techniques related to data handling, including SQL, database management, data manipulation, and data retrieval using APIs.
+
+This project aims to test knowledge of the Python programming language, the SQL programming language, git and GitHub, the command interface, cloud computing, and web APIs.
 
 ### Lessons learned
 
@@ -284,6 +296,25 @@ Follow these instructions to set up and install the project on your local machin
     s3_products_address = `link_to_AiCore_products.csv`
     ```
 
+### Connect to local database
+
+pgAdmin is used to connect to the local database. With pgAdmin installed and running, create a database to upload the data to with these steps:
+
+Within the PgAdmin UI:
+
+- Under the `Object Explorer` panel on the left hand side
+- Navigate to the `Databases` sub menu
+- Right click on `Databases`
+- Select `Create` -> `Database`.
+
+  ![Create -> Database](README_Images/pgadmin_create_database.png)
+
+- Under the `General` tab, enter a name for the new server connection
+
+  ![Database Name](README_Images/pgadmin_database_name.png)
+
+- Click `Save`
+
 ### Project Navigation
 
 1. Navigate to the project directory:
@@ -298,10 +329,13 @@ Follow these instructions to set up and install the project on your local machin
     python data_ETL_main.py
     ```
 
+    > The following image shows the Entity–relationship model diagram of the created database
+    ![sales_data ERD](README_Images/sales_data_ERD.png)
+
 3. Run the following notebook to query the data:
 
-    ```bash
-    python data_query.ipynb
+    ```python
+    data_query.ipynb
     ```
 
 ## Classes and Methods
